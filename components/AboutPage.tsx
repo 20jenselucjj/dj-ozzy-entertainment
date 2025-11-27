@@ -52,7 +52,7 @@ const AboutPage: React.FC = () => {
           {/* About Image - Top */}
           <div className="relative h-[35vh] sm:h-[40vh] md:h-[45vh] lg:h-1/2 overflow-hidden">
             <img 
-              src="/Assets/About.png" 
+              src="/About.png" 
               alt="DJ Ozzy" 
               className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
             />
@@ -65,7 +65,7 @@ const AboutPage: React.FC = () => {
           {/* Party Image - Bottom */}
           <div className="relative h-[35vh] sm:h-[40vh] md:h-[45vh] lg:h-1/2 overflow-hidden">
             <img 
-              src="/Assets/Party.png" 
+              src="/Party.png" 
               alt="Party atmosphere" 
               className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
             />

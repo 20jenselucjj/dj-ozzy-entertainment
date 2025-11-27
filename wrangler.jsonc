@@ -3,5 +3,8 @@
   "compatibility_date": "2025-11-27",
   "assets": {
     "directory": "./dist"
+  },
+  "vars": {
+    "RESEND_API_KEY": "re_bUqSnMP4_4QM2HELVfVkHhqwMzagkvAiu"
   }
 }

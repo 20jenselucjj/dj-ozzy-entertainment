@@ -54,7 +54,7 @@ const App: React.FC = () => {
           {/* Logo / Brand Name */}
           <button onClick={() => handleNavigation('Home')} className="flex items-center">
             <img 
-              src="/Assets/Logo.png" 
+              src="/Logo.png" 
               alt="DJ Ozzy" 
               className="h-12 w-auto object-contain hover:opacity-80 transition-opacity"
             />

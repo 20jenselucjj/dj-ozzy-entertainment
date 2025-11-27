@@ -32,7 +32,7 @@ const AboutSection: React.FC = () => {
         {/* Right Image Column */}
         <div className="col-span-1 md:col-span-8 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
           <img 
-            src="/Assets/Me.png" 
+            src="/me.png" 
             alt="DJ Ozzy" 
             className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
           />

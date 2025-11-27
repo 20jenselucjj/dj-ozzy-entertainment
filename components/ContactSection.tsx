@@ -11,19 +11,34 @@ const ContactSection: React.FC = () => {
 
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Show alert as requested
-        alert('Thank you for reaching out! We will get back to you soon.');
         
-        // Reset form and trigger success animation
-        setFormState({ name: '', email: '', message: '' });
-        setIsSubmitted(true);
+        try {
+            const response = await fetch('/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formState),
+            });
 
-        // Reset the success state after 3 seconds to show the form again
-        setTimeout(() => {
-            setIsSubmitted(false);
-        }, 3000);
+            if (response.ok) {
+                // Reset form and trigger success animation
+                setFormState({ name: '', email: '', message: '' });
+                setIsSubmitted(true);
+
+                // Reset the success state after 3 seconds to show the form again
+                setTimeout(() => {
+                    setIsSubmitted(false);
+                }, 3000);
+            } else {
+                alert('Failed to send message. Please try again or contact us directly.');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Failed to send message. Please try again or contact us directly.');
+        }
     };
 
     return (
