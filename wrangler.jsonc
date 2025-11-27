@@ -1,10 +1,8 @@
 {
   "name": "dj-ozzy-entertainment",
   "compatibility_date": "2025-11-27",
+  "main": "worker.ts",
   "assets": {
     "directory": "./dist"
-  },
-  "vars": {
-    "RESEND_API_KEY": "re_bUqSnMP4_4QM2HELVfVkHhqwMzagkvAiu"
   }
 }
