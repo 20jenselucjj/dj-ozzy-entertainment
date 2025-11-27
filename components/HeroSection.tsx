@@ -25,7 +25,7 @@ const HeroSection: React.FC = () => {
       
       <div className="mt-12 md:mt-20 text-center max-w-lg mx-auto opacity-0 animate-text-reveal delay-1000">
         <p className="text-sm md:text-base text-gray-600 uppercase tracking-widest">
-            Fresh Music. Good Vibes. Unforgettable Nights.
+            FOR THE YOUTH BY THE YOUTH
         </p>
       </div>
     </section>
