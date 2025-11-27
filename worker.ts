@@ -29,13 +29,52 @@ export default {
             from: 'onboarding@resend.dev',
             to: ['djozzyentertainment@gmail.com'],
             reply_to: formData.email,
-            subject: `New Contact Form Submission from ${formData.name}`,
+            subject: `New Booking Inquiry from ${formData.name}`,
             html: `
-              <h2>New Contact Form Submission</h2>
-              <p><strong>Name:</strong> ${formData.name}</p>
-              <p><strong>Email:</strong> ${formData.email}</p>
-              <p><strong>Message:</strong></p>
-              <p>${formData.message.replace(/\n/g, '<br>')}</p>
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <style>
+                  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #F0EAD6; margin: 0; padding: 40px 20px; }
+                  .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+                  .header { background: #0f0f0f; color: #F0EAD6; padding: 32px 40px; border-bottom: 3px solid #F0EAD6; }
+                  .header h1 { margin: 0; font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; }
+                  .header p { margin: 8px 0 0 0; font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+                  .content { padding: 40px; }
+                  .field { margin-bottom: 28px; }
+                  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #666; margin-bottom: 8px; font-weight: 600; }
+                  .value { font-size: 16px; color: #0f0f0f; line-height: 1.6; }
+                  .message-box { background: #f8f8f8; padding: 20px; border-radius: 4px; border-left: 3px solid #0f0f0f; margin-top: 8px; }
+                  .footer { background: #f8f8f8; padding: 24px 40px; text-align: center; font-size: 13px; color: #666; border-top: 1px solid #e0e0e0; }
+                  a { color: #0f0f0f; text-decoration: none; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1>New Booking Inquiry</h1>
+                    <p>DJ Ozzy Entertainment</p>
+                  </div>
+                  <div class="content">
+                    <div class="field">
+                      <div class="label">Name</div>
+                      <div class="value">${formData.name}</div>
+                    </div>
+                    <div class="field">
+                      <div class="label">Email</div>
+                      <div class="value"><a href="mailto:${formData.email}">${formData.email}</a></div>
+                    </div>
+                    <div class="field">
+                      <div class="label">Message</div>
+                      <div class="message-box">${formData.message.replace(/\n/g, '<br>')}</div>
+                    </div>
+                  </div>
+                  <div class="footer">
+                    Reply directly to this email to respond to ${formData.name}
+                  </div>
+                </div>
+              </body>
+              </html>
             `,
           }),
         });
