@@ -113,7 +113,7 @@ const App: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 pt-20 -mt-16">
+      <main className={`relative z-10 ${location.pathname === '/' ? 'pt-20 -mt-16' : 'pt-20'}`}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
