@@ -101,7 +101,17 @@ export default {
       }
     }
 
-    // Serve static assets for all other requests
-    return env.ASSETS.fetch(request);
+    // For all other requests, try to serve the asset
+    // If it's not found (404), serve index.html to support client-side routing
+    const response = await env.ASSETS.fetch(request);
+    
+    // If the asset is not found and it's not a file request (no extension),
+    // serve index.html to let React Router handle the route
+    if (response.status === 404 && !url.pathname.includes('.')) {
+      const indexRequest = new Request(new URL('/', request.url), request);
+      return env.ASSETS.fetch(indexRequest);
+    }
+    
+    return response;
   },
 };
