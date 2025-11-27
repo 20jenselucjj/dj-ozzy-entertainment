@@ -12,6 +12,11 @@ const App: React.FC = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  // Scroll to top on route change
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const handleNavigation = (item: string) => {
     if (item === 'About') {
       navigate('/about');
