@@ -6,12 +6,15 @@ const HeroSection: React.FC = () => {
       <div className="w-full relative z-10">
         {/* Massive typographic layout */}
         {/* Adjusted sizes to ensure no clipping occurs on mobile or full screen */}
-        <h1 className="font-serif leading-[0.9] tracking-tight uppercase flex flex-col items-center w-full overflow-visible">
+        <h1 className="font-serif leading-[1.1] tracking-tight uppercase flex flex-col items-center w-full overflow-visible">
             {/* Staggered layout with Shimmer and Slow Reveal Effects */}
-            <span className="text-[12vw] md:text-[11vw] lg:text-[12vw] block w-full text-left pl-2 md:pl-8 py-4 md:py-6 pb-8 md:pb-10 opacity-0 animate-text-reveal delay-100 overflow-visible">
-              <span className="shimmer-text animate-shimmer">Party With</span>
+            <span className="text-[10vw] md:text-[8vw] lg:text-[7vw] block w-full text-left pl-2 md:pl-8 py-3 md:py-4 opacity-0 animate-text-reveal delay-100 overflow-visible">
+              <span className="shimmer-text animate-shimmer">Party</span>
             </span>
-            <span className="text-[12vw] md:text-[11vw] lg:text-[12vw] block w-full text-right pr-2 md:pr-8 mt-2 md:mt-4 py-4 md:py-6 pb-8 md:pb-10 opacity-0 animate-text-reveal delay-500 overflow-visible">
+            <span className="text-[10vw] md:text-[8vw] lg:text-[7vw] block w-full text-center -mt-3 md:-mt-4 py-2 opacity-0 animate-text-reveal delay-300 overflow-visible">
+              <span className="shimmer-text animate-shimmer">With</span>
+            </span>
+            <span className="text-[10vw] md:text-[8vw] lg:text-[7vw] block w-full text-right pr-2 md:pr-8 -mt-3 md:-mt-4 py-3 md:py-4 opacity-0 animate-text-reveal delay-500 overflow-visible">
               <span className="shimmer-text animate-shimmer">DJ Ozzy</span>
             </span>
         </h1>
