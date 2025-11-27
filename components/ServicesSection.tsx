@@ -52,19 +52,25 @@ const ServicesSection: React.FC = () => {
                 ${index !== 0 ? 'md:pl-12' : ''}
                 relative group flex flex-col h-full justify-between
              `}>
-                <FadeIn delay={200 + (index * 100)}>
+                <FadeIn delay={200 + (index * 100)} variant="text">
                    <div className="mb-8 p-4 border border-black/10 inline-block rounded-full text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-beige transition-all duration-300">
                       {service.icon}
                    </div>
+                </FadeIn>
                    
-                   <div>
+                <div>
+                    <FadeIn delay={300 + (index * 100)} variant="text">
                        <h3 className="font-serif text-2xl md:text-3xl mb-3">{service.title}</h3>
+                    </FadeIn>
+                    <FadeIn delay={400 + (index * 100)} variant="text">
                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">{service.subtitle}</p>
+                    </FadeIn>
+                    <FadeIn delay={500 + (index * 100)} variant="text">
                        <p className="text-sm md:text-base leading-relaxed text-gray-700">
                           {service.description}
                        </p>
-                   </div>
-                </FadeIn>
+                    </FadeIn>
+                </div>
              </div>
           ))}
        </div>

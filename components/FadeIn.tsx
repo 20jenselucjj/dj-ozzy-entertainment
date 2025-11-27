@@ -46,8 +46,11 @@ const FadeIn: React.FC<FadeInProps> = ({
   return (
     <div
       ref={ref}
-      className={`${className} ${isVisible ? `${animationClass} opacity-100` : 'opacity-0'}`}
-      style={{ animationDelay: `${delay}ms` }}
+      className={`${className} ${isVisible ? animationClass : 'opacity-0'}`}
+      style={{ 
+        animationDelay: isVisible ? `${delay}ms` : '0ms',
+        animationFillMode: 'both'
+      }}
     >
       {children}
     </div>
