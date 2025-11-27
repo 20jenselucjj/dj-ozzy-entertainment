@@ -44,7 +44,7 @@ const events: Event[] = [
 const PastEventsSection: React.FC = () => {
   return (
     <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-16 md:py-24 px-4 md:px-8">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 text-center md:text-left">
         <div>
            <FadeIn delay={0} variant="text">
              <span className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2 block">Our History</span>
@@ -54,7 +54,7 @@ const PastEventsSection: React.FC = () => {
            </FadeIn>
         </div>
         <FadeIn delay={200} className="mt-4 md:mt-0" variant="text">
-          <p className="max-w-xs text-sm text-gray-600 text-right md:text-left">
+          <p className="max-w-xs text-sm text-gray-600 md:text-right">
               Some of the awesome events I've had the chance to DJ at.
           </p>
         </FadeIn>

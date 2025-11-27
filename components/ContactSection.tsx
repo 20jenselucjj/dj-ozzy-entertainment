@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, MapPin, Mail, Phone } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const ContactSection: React.FC = () => {
@@ -42,7 +42,7 @@ const ContactSection: React.FC = () => {
     };
 
     return (
-        <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-16 md:py-24 px-4 md:px-8 bg-brand-dark text-brand-beige">
+        <section id="contact" className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-16 md:py-24 px-4 md:px-8 bg-brand-dark text-brand-beige">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                 
                 {/* Contact Info */}
@@ -64,21 +64,36 @@ const ContactSection: React.FC = () => {
 
                     <div className="space-y-6">
                         <FadeIn delay={300} variant="text">
-                            <div>
-                                <p className="text-xs uppercase text-gray-500 mb-1">Email</p>
-                                <a href="mailto:djozzyentertainment@gmail.com" className="text-xl font-serif relative group inline-block">
-                                    <span className="relative z-10 transition-colors group-hover:text-white">djozzyentertainment@gmail.com</span>
-                                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
-                                </a>
+                            <div className="flex items-start gap-3">
+                                <MapPin size={20} className="mt-1 text-brand-beige/70" />
+                                <div>
+                                    <p className="text-xs uppercase text-gray-500 mb-1">Location</p>
+                                    <p className="text-xl font-serif">Southern Utah</p>
+                                </div>
+                            </div>
+                        </FadeIn>
+                        <FadeIn delay={350} variant="text">
+                            <div className="flex items-start gap-3">
+                                <Mail size={20} className="mt-1 text-brand-beige/70" />
+                                <div>
+                                    <p className="text-xs uppercase text-gray-500 mb-1">Email</p>
+                                    <a href="mailto:djozzyentertainment@gmail.com" className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">djozzyentertainment@gmail.com</span>
+                                        <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                                    </a>
+                                </div>
                             </div>
                         </FadeIn>
                         <FadeIn delay={400} variant="text">
-                            <div>
-                                <p className="text-xs uppercase text-gray-500 mb-1">Phone</p>
-                                <a href="tel:+14358624679" className="text-xl font-serif relative group inline-block">
-                                    <span className="relative z-10 transition-colors group-hover:text-white">+1 (435) 862-4679</span>
-                                    <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
-                                </a>
+                            <div className="flex items-start gap-3">
+                                <Phone size={20} className="mt-1 text-brand-beige/70" />
+                                <div>
+                                    <p className="text-xs uppercase text-gray-500 mb-1">Phone</p>
+                                    <a href="tel:+14358624679" className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">+1 (435) 862-4679</span>
+                                        <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                                    </a>
+                                </div>
                             </div>
                         </FadeIn>
                     </div>

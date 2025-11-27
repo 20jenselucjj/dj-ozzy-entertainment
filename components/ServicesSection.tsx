@@ -27,7 +27,7 @@ const ServicesSection: React.FC = () => {
   return (
     <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-20 md:py-32 px-4 md:px-8">
        {/* Header */}
-       <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-end gap-6">
+       <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left">
           <div className="max-w-2xl">
               <FadeIn variant="text">
                 <span className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-3 block">Services</span>

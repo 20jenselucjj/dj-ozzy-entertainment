@@ -3,6 +3,13 @@ import { ArrowRight } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const AboutSection: React.FC = () => {
+  const scrollToContact = () => {
+    const element = document.getElementById('contact');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10">
       <div className="grid grid-cols-1 md:grid-cols-12 md:min-h-[80vh]">
@@ -22,7 +29,10 @@ const AboutSection: React.FC = () => {
               </p>
             </FadeIn>
 
-            <button className="group bg-black text-white px-8 py-3 rounded-full text-sm font-medium tracking-wide flex items-center gap-2 transition-all duration-300 hover:bg-gray-800 hover:-translate-y-1 hover:shadow-lg">
+            <button 
+              onClick={scrollToContact}
+              className="group bg-black text-white px-8 py-3 rounded-full text-sm font-medium tracking-wide flex items-center gap-2 transition-all duration-300 hover:bg-gray-800 hover:-translate-y-1 hover:shadow-lg"
+            >
               Get in Touch
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </button>
