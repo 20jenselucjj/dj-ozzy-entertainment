@@ -108,7 +108,7 @@ const App: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <main className="relative z-10 pt-20">
+      <main className="relative z-10 pt-20 -mt-16">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
