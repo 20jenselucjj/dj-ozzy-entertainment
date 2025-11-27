@@ -21,7 +21,7 @@ const AboutPage: React.FC = () => {
       {/* Mobile Layout */}
       <div className="lg:hidden">
         {/* Hero Image */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden pt-4">
           <img 
             src="/About.png" 
             alt="DJ Ozzy" 
