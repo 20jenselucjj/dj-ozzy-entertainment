@@ -17,14 +17,14 @@ const AboutPage: React.FC = () => {
   };
 
   return (
-    <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 min-h-screen">
+    <section className="w-full max-w-[1440px] mx-auto min-h-screen">
       {/* Mobile Layout */}
       <div className="lg:hidden">
         {/* Hero Image */}
         <div className="relative overflow-hidden pt-4">
           <img 
             src="/About.png" 
-            alt="DJ Ozzy" 
+            alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
             className="w-full h-auto"
           />
           <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-brand-beige to-transparent"></div>
@@ -67,7 +67,7 @@ const AboutPage: React.FC = () => {
         <div className="relative h-[40vh] overflow-hidden">
           <img 
             src="/Party.png" 
-            alt="Party atmosphere" 
+            alt="Energetic party atmosphere with crowd dancing at DJ Ozzy event in Southern Utah" 
             className="w-full h-full object-cover object-center"
           />
         </div>
@@ -76,7 +76,7 @@ const AboutPage: React.FC = () => {
       {/* Desktop Layout */}
       <div className="hidden lg:grid lg:grid-cols-2 gap-0">
         {/* Left Content Column */}
-        <div className="p-12 lg:p-16 flex flex-col justify-center border-r border-dashed border-black/10 bg-brand-beige">
+        <div className="p-12 lg:p-16 flex flex-col justify-center bg-brand-beige">
           <div className="max-w-xl">
             <FadeIn delay={100} variant="text">
               <h2 className="font-serif text-5xl lg:text-6xl leading-tight mb-10">
@@ -113,7 +113,7 @@ const AboutPage: React.FC = () => {
           <div className="relative overflow-hidden">
             <img 
               src="/About.png" 
-              alt="DJ Ozzy" 
+              alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
               className="w-full h-auto hover:scale-105 transition-all duration-700 ease-in-out"
             />
             <div className="absolute bottom-0 left-0 w-full h-1/4 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
@@ -124,7 +124,7 @@ const AboutPage: React.FC = () => {
           <div className="relative h-1/2 overflow-hidden">
             <img 
               src="/Party.png" 
-              alt="Party atmosphere" 
+              alt="Energetic party atmosphere with crowd dancing at DJ Ozzy event in Southern Utah" 
               className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
             />
             <div className="absolute bottom-0 left-0 w-full h-1/4 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>

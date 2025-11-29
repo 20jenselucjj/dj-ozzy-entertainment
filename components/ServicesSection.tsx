@@ -25,7 +25,7 @@ const ServicesSection: React.FC = () => {
   ];
 
   return (
-    <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-20 md:py-32 px-4 md:px-8">
+    <section className="w-full max-w-[1440px] mx-auto py-20 md:py-32 px-4 md:px-8 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
        {/* Header */}
        <div className="mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 text-center md:text-left">
           <div className="max-w-2xl">
@@ -43,17 +43,17 @@ const ServicesSection: React.FC = () => {
           </FadeIn>
        </div>
 
-       {/* Grid */}
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-0 border-t md:border-t-0 md:border-b-0 border-dashed border-black/10">
+       {/* Services */}
+       <div className="flex flex-col md:flex-row gap-12 md:gap-0">
           {services.map((service, index) => (
              <div key={index} className={`
-                pt-8 md:pt-12 md:pb-12
-                ${index !== services.length - 1 ? 'md:border-r border-dashed border-black/10 md:pr-12' : ''}
+                pt-8 md:pt-12 md:pb-12 md:flex-1
+                ${index !== services.length - 1 ? 'md:pr-12' : ''}
                 ${index !== 0 ? 'md:pl-12' : ''}
                 relative group flex flex-col h-full justify-between
              `}>
                 <FadeIn delay={200 + (index * 100)} variant="text">
-                   <div className="mb-8 p-4 border border-black/10 inline-block rounded-full text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-beige transition-all duration-300">
+                   <div className="mb-8 p-4 inline-block rounded-full text-brand-dark group-hover:bg-brand-dark group-hover:text-brand-beige transition-all duration-300">
                       {service.icon}
                    </div>
                 </FadeIn>

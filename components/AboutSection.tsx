@@ -11,11 +11,11 @@ const AboutSection: React.FC = () => {
   };
 
   return (
-    <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10">
-      <div className="grid grid-cols-1 md:grid-cols-12 md:min-h-[80vh]">
+    <section className="w-full max-w-[1440px] mx-auto shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
+      <div className="flex flex-col md:flex-row md:min-h-[80vh]">
         
         {/* Left Content Column */}
-        <div className="col-span-1 md:col-span-4 p-6 md:p-12 lg:p-16 flex flex-col justify-center border-r border-dashed border-black/10 relative order-2 md:order-1">
+        <div className="md:w-1/3 p-6 md:p-12 lg:p-16 flex flex-col justify-center relative order-2 md:order-1">
           <div className="md:sticky md:top-32">
             <FadeIn delay={100} variant="text">
               <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 md:mb-8">
@@ -40,10 +40,10 @@ const AboutSection: React.FC = () => {
         </div>
 
         {/* Right Image Column */}
-        <div className="col-span-1 md:col-span-8 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
+        <div className="md:w-2/3 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
           <img 
             src="/me.png" 
-            alt="DJ Ozzy" 
+            alt="DJ Ozzy performing at an event with professional DJ equipment and lighting setup" 
             className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
           />
           {/* Overlay gradient for style */}

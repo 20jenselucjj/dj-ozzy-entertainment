@@ -47,14 +47,8 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden font-sans text-brand-dark bg-brand-beige">
-      {/* Decorative Grid Lines Overlay - Fixed to background to simulate the design feel */}
-      <div className="fixed inset-0 pointer-events-none z-0 flex justify-between w-full max-w-[1400px] mx-auto px-4 md:px-8 border-x border-dashed border-black/10 opacity-0 animate-fade-in">
-        <div className="h-full border-r border-dashed border-black/10 hidden md:block w-1/3"></div>
-        <div className="h-full border-r border-dashed border-black/10 hidden md:block w-1/3"></div>
-      </div>
-      
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-beige/90 backdrop-blur-sm border-b border-dashed border-black/10 opacity-0 animate-fade-in delay-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-brand-beige/90 backdrop-blur-sm border-b border-dashed border-black/10 shadow-[0_4px_20px_rgba(0,0,0,0.08)] opacity-0 animate-fade-in delay-100">
         <div className="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo / Brand Name */}
           <button onClick={() => handleNavigation('Home')} className="flex items-center">

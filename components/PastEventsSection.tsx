@@ -16,7 +16,7 @@ const events: Event[] = [
     title: "Summer Solstice Festival",
     date: "June 21, 2023",
     location: "Miami Beach, FL",
-    image: "https://images.unsplash.com/photo-1533174072545-e8d4aa97edf9?q=80&w=1000&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1000&auto=format&fit=crop"
   },
   {
     id: 2,
@@ -43,7 +43,7 @@ const events: Event[] = [
 
 const PastEventsSection: React.FC = () => {
   return (
-    <section className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-16 md:py-24 px-4 md:px-8">
+    <section className="w-full max-w-[1440px] mx-auto py-16 md:py-24 px-4 md:px-8 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 text-center md:text-left">
         <div>
            <FadeIn delay={0} variant="text">
@@ -60,14 +60,14 @@ const PastEventsSection: React.FC = () => {
         </FadeIn>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+      <div className="flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-8">
         {events.map((event) => (
-          <div key={event.id} className="group relative cursor-pointer overflow-hidden h-full">
+          <div key={event.id} className="group relative cursor-pointer overflow-hidden h-full md:flex-1 md:min-w-[200px]">
              {/* Card Content */}
              <div className="aspect-[3/4] overflow-hidden bg-gray-200">
                 <img 
                     src={event.image} 
-                    alt={event.title}
+                    alt={`${event.title} - DJ event at ${event.location} featuring live music and entertainment`}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
              </div>

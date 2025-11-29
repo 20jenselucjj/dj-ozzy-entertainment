@@ -42,11 +42,11 @@ const ContactSection: React.FC = () => {
     };
 
     return (
-        <section id="contact" className="w-full max-w-[1440px] mx-auto border-t border-dashed border-black/10 py-16 md:py-24 px-4 md:px-8 bg-brand-dark text-brand-beige">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+        <section id="contact" className="w-full max-w-[1440px] mx-auto py-16 md:py-24 px-4 md:px-8 bg-brand-dark text-brand-beige shadow-[0_10px_50px_rgba(0,0,0,0.4)]">
+            <div className="flex flex-col md:flex-row gap-16">
                 
                 {/* Contact Info */}
-                <div className="flex flex-col justify-between">
+                <div className="flex flex-col justify-between md:flex-1">
                     <div>
                         <FadeIn delay={0} variant="text">
                             <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-2 block">Bookings</span>
