@@ -20,6 +20,13 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   // GET - Fetch events
   if (request.method === 'GET') {
     try {
+      // Check if KV is available
+      if (!env.EVENTS_KV) {
+        return new Response(JSON.stringify({ events: [] }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
       const eventsData = await env.EVENTS_KV.get('events');
       const events = eventsData ? JSON.parse(eventsData) : [];
       
@@ -27,8 +34,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     } catch (error) {
-      return new Response(JSON.stringify({ error: 'Failed to fetch events' }), {
-        status: 500,
+      console.error('Events fetch error:', error);
+      // Return empty events instead of error to prevent UI breaking
+      return new Response(JSON.stringify({ events: [] }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
@@ -37,6 +45,14 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   // POST - Save events
   if (request.method === 'POST') {
     try {
+      // Check if KV is available
+      if (!env.EVENTS_KV) {
+        return new Response(JSON.stringify({ error: 'KV storage not configured. Please bind EVENTS_KV in Cloudflare Pages settings.' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
       const { events } = await request.json() as { events: any[] };
       
       await env.EVENTS_KV.put('events', JSON.stringify(events));
@@ -45,6 +61,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     } catch (error) {
+      console.error('Events save error:', error);
       return new Response(JSON.stringify({ error: 'Failed to save events' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
