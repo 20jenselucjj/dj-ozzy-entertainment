@@ -1,9 +1,9 @@
 interface Env {
-  EVENTS_KV: KVNamespace;
+  EVENTS_KV: any;
   ADMIN_PASSWORD: string;
 }
 
-export const onRequest: PagesFunction<Env> = async (context) => {
+export const onRequest = async (context: { request: Request; env: Env }) => {
   const { request, env } = context;
   
   // CORS headers
@@ -42,9 +42,18 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     }
   }
 
-  // POST - Save events
+  // POST - Save events (requires authentication)
   if (request.method === 'POST') {
     try {
+      // Check authorization header
+      const authHeader = request.headers.get('Authorization');
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
       // Check if KV is available
       if (!env.EVENTS_KV) {
         return new Response(JSON.stringify({ error: 'KV storage not configured. Please bind EVENTS_KV in Cloudflare Pages settings.' }), {
@@ -54,6 +63,14 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       }
       
       const { events } = await request.json() as { events: any[] };
+      
+      // Validate events data
+      if (!Array.isArray(events)) {
+        return new Response(JSON.stringify({ error: 'Invalid events data' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
       
       await env.EVENTS_KV.put('events', JSON.stringify(events));
       

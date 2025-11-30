@@ -23,6 +23,14 @@ const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
 
+  // Check for existing session on mount
+  useEffect(() => {
+    const token = sessionStorage.getItem('adminToken');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchEvents();
@@ -39,14 +47,31 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simple password check - you'll set this in Cloudflare
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
-    } else {
-      alert('Invalid password');
+    setLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Store token in sessionStorage (cleared when browser closes)
+        sessionStorage.setItem('adminToken', data.token);
+        setIsAuthenticated(true);
+      } else {
+        alert('Invalid password');
+      }
+    } catch (error) {
+      alert('Login failed. Please try again.');
     }
+    
+    setLoading(false);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,9 +122,13 @@ const AdminPage: React.FC = () => {
         rating: editingEvent.rating || 0
       };
       
+      const token = sessionStorage.getItem('adminToken');
       const response = await fetch('/api/events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ 
           events: editingEvent.id ? 
             events.map(e => e.id === editingEvent.id ? eventToSave : e) :
@@ -124,9 +153,13 @@ const AdminPage: React.FC = () => {
     
     setLoading(true);
     try {
+      const token = sessionStorage.getItem('adminToken');
       await fetch('/api/events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ events: events.filter(e => e.id !== id) })
       });
       await fetchEvents();
@@ -148,8 +181,12 @@ const AdminPage: React.FC = () => {
             placeholder="Enter password"
             className="w-full px-4 py-3 border border-black/20 rounded mb-4 focus:outline-none focus:border-brand-dark transition-colors"
           />
-          <button type="submit" className="w-full bg-brand-dark text-white py-3 rounded hover:bg-black transition-colors font-medium tracking-wide">
-            Login
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-brand-dark text-white py-3 rounded hover:bg-black transition-colors font-medium tracking-wide disabled:opacity-50"
+          >
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>
