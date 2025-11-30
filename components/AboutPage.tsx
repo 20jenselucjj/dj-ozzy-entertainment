@@ -5,9 +5,13 @@ import FadeIn from './FadeIn';
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
-  const [images, setImages] = React.useState({
+  const [content, setContent] = React.useState({
     aboutImage: '/About.png',
-    partyImage: '/Party.png'
+    partyImage: '/Party.png',
+    aboutPageTitle: 'My Story',
+    aboutPageParagraph1: 'Growing up I had the privilege to be class president for three years and Student Body President at Snow Canyon High School in St. George. One of the best parts of the job was putting together dances. The chance to after a long day to connect with all my friends and dance to music we loved was the best.',
+    aboutPageParagraph2: "However there was always one problem: As a student council we couldn't find any DJ that understood what we wanted to hear, brought the right energy, and someone we could afford and trust.",
+    aboutPageParagraph3: "My senior year when my frustration peaked I finally decided why not me? I have the energy, know what people want to hear, have the background, and could fit in anyone's budget. My goal is to give everyone in Southern Utah an opportunity to make priceless memories with the people they love, with fresh updated music, and to be someone that can be trusted and relied on."
   });
 
   React.useEffect(() => {
@@ -15,9 +19,13 @@ const AboutPage: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         if (data.settings) {
-          setImages({
-            aboutImage: data.settings.aboutImage,
-            partyImage: data.settings.partyImage
+          setContent({
+            aboutImage: data.settings.aboutImage || '/About.png',
+            partyImage: data.settings.partyImage || '/Party.png',
+            aboutPageTitle: data.settings.aboutPageTitle,
+            aboutPageParagraph1: data.settings.aboutPageParagraph1,
+            aboutPageParagraph2: data.settings.aboutPageParagraph2,
+            aboutPageParagraph3: data.settings.aboutPageParagraph3
           });
         }
       })
@@ -41,7 +49,7 @@ const AboutPage: React.FC = () => {
         {/* Hero Image */}
         <div className="relative overflow-hidden pt-4">
           <img 
-            src={images.aboutImage} 
+            src={content.aboutImage} 
             alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
             className="w-full h-auto"
           />
@@ -52,20 +60,20 @@ const AboutPage: React.FC = () => {
         <div className="px-6 py-12 bg-brand-beige">
           <FadeIn delay={100} variant="text">
             <h2 className="font-serif text-4xl leading-tight mb-6 text-center">
-              My Story
+              {content.aboutPageTitle}
             </h2>
           </FadeIn>
           
           <FadeIn delay={300} variant="text">
             <div className="space-y-4 max-w-lg mx-auto">
               <p className="font-sans text-base leading-relaxed text-gray-700">
-                Growing up I had the privilege to be class president for three years and Student Body President at Snow Canyon High School in St. George. One of the best parts of the job was putting together dances. The chance to after a long day to connect with all my friends and dance to music we loved was the best.
+                {content.aboutPageParagraph1}
               </p>
               <p className="font-sans text-base leading-relaxed text-gray-700">
-                However there was always one problem: As a student council we couldn't find any DJ that understood what we wanted to hear, brought the right energy, and someone we could afford and trust.
+                {content.aboutPageParagraph2}
               </p>
               <p className="font-sans text-base leading-relaxed text-gray-700">
-                My senior year when my frustration peaked I finally decided why not me? I have the energy, know what people want to hear, have the background, and could fit in anyone's budget. My goal is to give everyone in Southern Utah an opportunity to make priceless memories with the people they love, with fresh updated music, and to be someone that can be trusted and relied on.
+                {content.aboutPageParagraph3}
               </p>
             </div>
           </FadeIn>
@@ -98,20 +106,20 @@ const AboutPage: React.FC = () => {
           <div className="max-w-xl">
             <FadeIn delay={100} variant="text">
               <h2 className="font-serif text-5xl lg:text-6xl leading-tight mb-10">
-                My Story
+                {content.aboutPageTitle}
               </h2>
             </FadeIn>
             
             <FadeIn delay={300} variant="text">
               <div className="space-y-6">
                 <p className="font-sans text-lg leading-relaxed text-gray-700">
-                  Growing up I had the privilege to be class president for three years and Student Body President at Snow Canyon High School in St. George. One of the best parts of the job was putting together dances. The chance to after a long day to connect with all my friends and dance to music we loved was the best.
+                  {content.aboutPageParagraph1}
                 </p>
                 <p className="font-sans text-lg leading-relaxed text-gray-700">
-                  However there was always one problem: As a student council we couldn't find any DJ that understood what we wanted to hear, brought the right energy, and someone we could afford and trust.
+                  {content.aboutPageParagraph2}
                 </p>
                 <p className="font-sans text-lg leading-relaxed text-gray-700">
-                  My senior year when my frustration peaked I finally decided why not me? I have the energy, know what people want to hear, have the background, and could fit in anyone's budget. My goal is to give everyone in Southern Utah an opportunity to make priceless memories with the people they love, with fresh updated music, and to be someone that can be trusted and relied on.
+                  {content.aboutPageParagraph3}
                 </p>
               </div>
             </FadeIn>
@@ -130,7 +138,7 @@ const AboutPage: React.FC = () => {
         <div className="relative flex flex-col">
           <div className="relative overflow-hidden">
             <img 
-              src={images.aboutImage} 
+              src={content.aboutImage} 
               alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
               className="w-full h-auto hover:scale-105 transition-all duration-700 ease-in-out"
             />
@@ -141,7 +149,7 @@ const AboutPage: React.FC = () => {
           
           <div className="relative h-1/2 overflow-hidden">
             <img 
-              src={images.partyImage} 
+              src={content.partyImage} 
               alt="Energetic party atmosphere with crowd dancing at DJ Ozzy event in Southern Utah" 
               className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
             />

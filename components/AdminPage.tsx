@@ -15,9 +15,50 @@ interface FormEvent extends Event {
 }
 
 interface SiteSettings {
+  // Images
   aboutImage: string;
   partyImage: string;
   meImage: string;
+  
+  // Hero Section
+  heroLine1: string;
+  heroLine2: string;
+  heroLine3: string;
+  heroTagline: string;
+  
+  // About Section (Homepage)
+  aboutTitle: string;
+  aboutDescription: string;
+  
+  // About Page
+  aboutPageTitle: string;
+  aboutPageParagraph1: string;
+  aboutPageParagraph2: string;
+  aboutPageParagraph3: string;
+  
+  // Services
+  servicesTitle: string;
+  servicesSubtitle: string;
+  service1Title: string;
+  service1Subtitle: string;
+  service1Description: string;
+  service2Title: string;
+  service2Subtitle: string;
+  service2Description: string;
+  service3Title: string;
+  service3Subtitle: string;
+  service3Description: string;
+  
+  // Contact
+  contactTitle: string;
+  contactDescription: string;
+  contactLocation: string;
+  contactEmail: string;
+  contactPhone: string;
+  
+  // SEO
+  siteTitle: string;
+  siteDescription: string;
 }
 
 const AdminPage: React.FC = () => {
@@ -30,9 +71,50 @@ const AdminPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'events' | 'settings'>('events');
   const [settings, setSettings] = useState<SiteSettings>({
+    // Images
     aboutImage: '/About.png',
     partyImage: '/Party.png',
-    meImage: '/me.png'
+    meImage: '/me.png',
+    
+    // Hero
+    heroLine1: 'Party',
+    heroLine2: 'With',
+    heroLine3: 'DJ Ozzy',
+    heroTagline: 'FOR THE YOUTH BY THE YOUTH',
+    
+    // About Section
+    aboutTitle: 'Your Event, Your Vibe',
+    aboutDescription: "I get it—you want music that actually hits. No awkward silences, no outdated playlists, just the songs you and your friends actually want to hear. Whether it's a school dance, party, or any event in Southern Utah, I'll bring the energy and keep everyone on the dance floor all night.",
+    
+    // About Page
+    aboutPageTitle: 'My Story',
+    aboutPageParagraph1: 'Growing up I had the privilege to be class president for three years and Student Body President at Snow Canyon High School in St. George. One of the best parts of the job was putting together dances. The chance to after a long day to connect with all my friends and dance to music we loved was the best.',
+    aboutPageParagraph2: "However there was always one problem: As a student council we couldn't find any DJ that understood what we wanted to hear, brought the right energy, and someone we could afford and trust.",
+    aboutPageParagraph3: "My senior year when my frustration peaked I finally decided why not me? I have the energy, know what people want to hear, have the background, and could fit in anyone's budget. My goal is to give everyone in Southern Utah an opportunity to make priceless memories with the people they love, with fresh updated music, and to be someone that can be trusted and relied on.",
+    
+    // Services
+    servicesTitle: 'What I Bring',
+    servicesSubtitle: 'Everything you need for an epic night without the hassle or crazy prices.',
+    service1Title: 'Your Music, Your Way',
+    service1Subtitle: 'Custom Playlists',
+    service1Description: "Tell me what you want to hear and I'll make it happen. Whether you're into the latest hits, throwbacks, or a mix of everything, I'll put together a playlist that keeps everyone vibing all night long.",
+    service2Title: 'Quality Sound & Lights',
+    service2Subtitle: 'Professional Setup',
+    service2Description: "I bring legit equipment that sounds amazing and looks even better. Clear audio, awesome lighting effects—everything you need to turn your venue into the place to be.",
+    service3Title: 'Reading the Room',
+    service3Subtitle: 'Keeping It Live',
+    service3Description: "I know when to turn it up and when to bring it down. I'll watch the crowd and adjust on the fly to make sure everyone's having a good time, not just standing around.",
+    
+    // Contact
+    contactTitle: "Let's Make It Happen",
+    contactDescription: "Got an event coming up? Whether it's a school dance, birthday party, or any celebration in Southern Utah, hit me up and let's talk about making it unforgettable. I'm flexible with dates and budgets.",
+    contactLocation: 'Southern Utah',
+    contactEmail: 'djozzyentertainment@gmail.com',
+    contactPhone: '+1 (435) 862-4679',
+    
+    // SEO
+    siteTitle: 'DJ Ozzy | DJ Ozzy Entertainment - Southern Utah DJ Services',
+    siteDescription: 'DJ Ozzy - Professional DJ services in Southern Utah for weddings, school dances, corporate events, and parties. Book DJ Ozzy Entertainment for unforgettable entertainment experiences.'
   });
   const [settingsPreview, setSettingsPreview] = useState<Partial<SiteSettings>>({});
 
@@ -492,8 +574,308 @@ const AdminPage: React.FC = () => {
 
         {/* Settings Tab */}
         {activeTab === 'settings' && (
-          <div className="space-y-8">
-            <h2 className="font-serif text-2xl text-brand-dark mb-6">About Page Images</h2>
+          <div className="space-y-12">
+            {/* SEO Settings */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">SEO & Meta</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Site Title</label>
+                  <input
+                    type="text"
+                    value={settings.siteTitle}
+                    onChange={(e) => setSettings({ ...settings, siteTitle: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Site Description</label>
+                  <textarea
+                    value={settings.siteDescription}
+                    onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Hero Section */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">Hero Section</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Line 1</label>
+                  <input
+                    type="text"
+                    value={settings.heroLine1}
+                    onChange={(e) => setSettings({ ...settings, heroLine1: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Line 2</label>
+                  <input
+                    type="text"
+                    value={settings.heroLine2}
+                    onChange={(e) => setSettings({ ...settings, heroLine2: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Line 3</label>
+                  <input
+                    type="text"
+                    value={settings.heroLine3}
+                    onChange={(e) => setSettings({ ...settings, heroLine3: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Tagline</label>
+                  <input
+                    type="text"
+                    value={settings.heroTagline}
+                    onChange={(e) => setSettings({ ...settings, heroTagline: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* About Section (Homepage) */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">About Section (Homepage)</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Title</label>
+                  <input
+                    type="text"
+                    value={settings.aboutTitle}
+                    onChange={(e) => setSettings({ ...settings, aboutTitle: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Description</label>
+                  <textarea
+                    value={settings.aboutDescription}
+                    onChange={(e) => setSettings({ ...settings, aboutDescription: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* About Page Content */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">About Page Content</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Page Title</label>
+                  <input
+                    type="text"
+                    value={settings.aboutPageTitle}
+                    onChange={(e) => setSettings({ ...settings, aboutPageTitle: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Paragraph 1</label>
+                  <textarea
+                    value={settings.aboutPageParagraph1}
+                    onChange={(e) => setSettings({ ...settings, aboutPageParagraph1: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Paragraph 2</label>
+                  <textarea
+                    value={settings.aboutPageParagraph2}
+                    onChange={(e) => setSettings({ ...settings, aboutPageParagraph2: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Paragraph 3</label>
+                  <textarea
+                    value={settings.aboutPageParagraph3}
+                    onChange={(e) => setSettings({ ...settings, aboutPageParagraph3: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Services Section */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">Services Section</h2>
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Section Title</label>
+                    <input
+                      type="text"
+                      value={settings.servicesTitle}
+                      onChange={(e) => setSettings({ ...settings, servicesTitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Section Subtitle</label>
+                    <input
+                      type="text"
+                      value={settings.servicesSubtitle}
+                      onChange={(e) => setSettings({ ...settings, servicesSubtitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="font-medium mb-4">Service 1</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={settings.service1Title}
+                      onChange={(e) => setSettings({ ...settings, service1Title: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Subtitle"
+                      value={settings.service1Subtitle}
+                      onChange={(e) => setSettings({ ...settings, service1Subtitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={settings.service1Description}
+                      onChange={(e) => setSettings({ ...settings, service1Description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="font-medium mb-4">Service 2</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={settings.service2Title}
+                      onChange={(e) => setSettings({ ...settings, service2Title: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Subtitle"
+                      value={settings.service2Subtitle}
+                      onChange={(e) => setSettings({ ...settings, service2Subtitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={settings.service2Description}
+                      onChange={(e) => setSettings({ ...settings, service2Description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="font-medium mb-4">Service 3</h3>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      value={settings.service3Title}
+                      onChange={(e) => setSettings({ ...settings, service3Title: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Subtitle"
+                      value={settings.service3Subtitle}
+                      onChange={(e) => setSettings({ ...settings, service3Subtitle: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                    <textarea
+                      placeholder="Description"
+                      value={settings.service3Description}
+                      onChange={(e) => setSettings({ ...settings, service3Description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">Contact Information</h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Section Title</label>
+                  <input
+                    type="text"
+                    value={settings.contactTitle}
+                    onChange={(e) => setSettings({ ...settings, contactTitle: e.target.value })}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Description</label>
+                  <textarea
+                    value={settings.contactDescription}
+                    onChange={(e) => setSettings({ ...settings, contactDescription: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Location</label>
+                    <input
+                      type="text"
+                      value={settings.contactLocation}
+                      onChange={(e) => setSettings({ ...settings, contactLocation: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Email</label>
+                    <input
+                      type="email"
+                      value={settings.contactEmail}
+                      onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Phone</label>
+                    <input
+                      type="tel"
+                      value={settings.contactPhone}
+                      onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
+                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Images Section */}
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">Site Images</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* About Image */}
@@ -569,23 +951,27 @@ const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            {Object.keys(settingsPreview).length > 0 && (
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setSettingsPreview({})}
-                  className="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={saveSettings}
-                  disabled={loading}
-                  className="px-6 py-3 bg-brand-dark text-white rounded hover:bg-black transition-colors disabled:opacity-50"
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-              </div>
-            )}
+            {/* Save Button - Always visible */}
+            <div className="sticky bottom-8 flex justify-end gap-4 bg-brand-beige/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-black/10">
+              <button
+                onClick={() => {
+                  if (confirm('Discard all changes?')) {
+                    fetchSettings();
+                    setSettingsPreview({});
+                  }
+                }}
+                className="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveSettings}
+                disabled={loading}
+                className="px-8 py-3 bg-brand-dark text-white rounded hover:bg-black transition-colors disabled:opacity-50 font-medium tracking-wide"
+              >
+                {loading ? 'Saving...' : 'Save All Changes'}
+              </button>
+            </div>
           </div>
         )}
       </div>

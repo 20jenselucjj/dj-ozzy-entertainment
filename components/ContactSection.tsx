@@ -10,6 +10,31 @@ const ContactSection: React.FC = () => {
     });
 
     const [isSubmitted, setIsSubmitted] = useState(false);
+    
+    const [content, setContent] = React.useState({
+        contactTitle: "Let's Make It Happen",
+        contactDescription: "Got an event coming up? Whether it's a school dance, birthday party, or any celebration in Southern Utah, hit me up and let's talk about making it unforgettable. I'm flexible with dates and budgets.",
+        contactLocation: 'Southern Utah',
+        contactEmail: 'djozzyentertainment@gmail.com',
+        contactPhone: '+1 (435) 862-4679'
+    });
+
+    React.useEffect(() => {
+        fetch('/api/settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data.settings) {
+                    setContent({
+                        contactTitle: data.settings.contactTitle,
+                        contactDescription: data.settings.contactDescription,
+                        contactLocation: data.settings.contactLocation,
+                        contactEmail: data.settings.contactEmail,
+                        contactPhone: data.settings.contactPhone
+                    });
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,12 +77,11 @@ const ContactSection: React.FC = () => {
                             <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-2 block">Bookings</span>
                         </FadeIn>
                         <FadeIn delay={100} variant="text">
-                            <h2 className="font-serif text-5xl md:text-7xl mb-8">Let's Make It Happen</h2>
+                            <h2 className="font-serif text-5xl md:text-7xl mb-8">{content.contactTitle}</h2>
                         </FadeIn>
                         <FadeIn delay={200} variant="text">
                             <p className="text-gray-400 max-w-md leading-relaxed mb-12">
-                                Got an event coming up? Whether it's a school dance, birthday party, or any celebration in Southern Utah, 
-                                hit me up and let's talk about making it unforgettable. I'm flexible with dates and budgets.
+                                {content.contactDescription}
                             </p>
                         </FadeIn>
                     </div>
@@ -68,7 +92,7 @@ const ContactSection: React.FC = () => {
                                 <MapPin size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Location</p>
-                                    <p className="text-xl font-serif">Southern Utah</p>
+                                    <p className="text-xl font-serif">{content.contactLocation}</p>
                                 </div>
                             </div>
                         </FadeIn>
@@ -77,8 +101,8 @@ const ContactSection: React.FC = () => {
                                 <Mail size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Email</p>
-                                    <a href="mailto:djozzyentertainment@gmail.com" className="text-xl font-serif relative group inline-block">
-                                        <span className="relative z-10 transition-colors group-hover:text-white">djozzyentertainment@gmail.com</span>
+                                    <a href={`mailto:${content.contactEmail}`} className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactEmail}</span>
                                         <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
                                     </a>
                                 </div>
@@ -89,8 +113,8 @@ const ContactSection: React.FC = () => {
                                 <Phone size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Phone</p>
-                                    <a href="tel:+14358624679" className="text-xl font-serif relative group inline-block">
-                                        <span className="relative z-10 transition-colors group-hover:text-white">+1 (435) 862-4679</span>
+                                    <a href={`tel:${content.contactPhone.replace(/[^0-9+]/g, '')}`} className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactPhone}</span>
                                         <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
                                     </a>
                                 </div>

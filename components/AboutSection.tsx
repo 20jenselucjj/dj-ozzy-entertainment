@@ -3,14 +3,22 @@ import { ArrowRight } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const AboutSection: React.FC = () => {
-  const [meImage, setMeImage] = React.useState('/me.png');
+  const [content, setContent] = React.useState({
+    meImage: '/me.png',
+    aboutTitle: 'Your Event, Your Vibe',
+    aboutDescription: "I get it—you want music that actually hits. No awkward silences, no outdated playlists, just the songs you and your friends actually want to hear. Whether it's a school dance, party, or any event in Southern Utah, I'll bring the energy and keep everyone on the dance floor all night."
+  });
 
   React.useEffect(() => {
     fetch('/api/settings')
       .then(res => res.json())
       .then(data => {
-        if (data.settings?.meImage) {
-          setMeImage(data.settings.meImage);
+        if (data.settings) {
+          setContent({
+            meImage: data.settings.meImage || '/me.png',
+            aboutTitle: data.settings.aboutTitle,
+            aboutDescription: data.settings.aboutDescription
+          });
         }
       })
       .catch(() => {});
@@ -32,13 +40,13 @@ const AboutSection: React.FC = () => {
           <div className="md:sticky md:top-32">
             <FadeIn delay={100} variant="text">
               <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 md:mb-8">
-                Your Event, Your Vibe
+                {content.aboutTitle}
               </h2>
             </FadeIn>
             
             <FadeIn delay={300} variant="text">
               <p className="font-sans text-sm md:text-base leading-relaxed text-gray-700 mb-8 max-w-md">
-                I get it—you want music that actually hits. No awkward silences, no outdated playlists, just the songs you and your friends actually want to hear. Whether it's a school dance, party, or any event in Southern Utah, I'll bring the energy and keep everyone on the dance floor all night.
+                {content.aboutDescription}
               </p>
             </FadeIn>
 
@@ -55,7 +63,7 @@ const AboutSection: React.FC = () => {
         {/* Right Image Column */}
         <div className="md:w-2/3 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
           <img 
-            src={meImage} 
+            src={content.meImage} 
             alt="DJ Ozzy performing at an event with professional DJ equipment and lighting setup" 
             className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
           />
