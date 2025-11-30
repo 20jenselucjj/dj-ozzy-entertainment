@@ -77,11 +77,11 @@ const ContactSection: React.FC = () => {
                             <span className="text-xs font-bold tracking-widest uppercase text-gray-400 mb-2 block">Bookings</span>
                         </FadeIn>
                         <FadeIn delay={100} variant="text">
-                            <h2 className="font-serif text-5xl md:text-7xl mb-8">{content.contactTitle}</h2>
+                            <h2 className="font-serif text-5xl md:text-7xl mb-8">{content.contactTitle || "Let's Make It Happen"}</h2>
                         </FadeIn>
                         <FadeIn delay={200} variant="text">
                             <p className="text-gray-400 max-w-md leading-relaxed mb-12">
-                                {content.contactDescription}
+                                {content.contactDescription || "Got an event coming up? Hit me up and let's talk about making it unforgettable."}
                             </p>
                         </FadeIn>
                     </div>
@@ -92,7 +92,7 @@ const ContactSection: React.FC = () => {
                                 <MapPin size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Location</p>
-                                    <p className="text-xl font-serif">{content.contactLocation}</p>
+                                    <p className="text-xl font-serif">{content.contactLocation || 'Southern Utah'}</p>
                                 </div>
                             </div>
                         </FadeIn>
@@ -101,8 +101,8 @@ const ContactSection: React.FC = () => {
                                 <Mail size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Email</p>
-                                    <a href={`mailto:${content.contactEmail}`} className="text-xl font-serif relative group inline-block">
-                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactEmail}</span>
+                                    <a href={`mailto:${content.contactEmail || ''}`} className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactEmail || 'djozzyentertainment@gmail.com'}</span>
                                         <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
                                     </a>
                                 </div>
@@ -113,8 +113,8 @@ const ContactSection: React.FC = () => {
                                 <Phone size={20} className="mt-1 text-brand-beige/70" />
                                 <div>
                                     <p className="text-xs uppercase text-gray-500 mb-1">Phone</p>
-                                    <a href={`tel:${content.contactPhone.replace(/[^0-9+]/g, '')}`} className="text-xl font-serif relative group inline-block">
-                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactPhone}</span>
+                                    <a href={`tel:${content.contactPhone?.replace(/[^0-9+]/g, '') || ''}`} className="text-xl font-serif relative group inline-block">
+                                        <span className="relative z-10 transition-colors group-hover:text-white">{content.contactPhone || ''}</span>
                                         <span className="absolute left-0 bottom-0 w-full h-[1px] bg-brand-beige origin-left transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
                                     </a>
                                 </div>
