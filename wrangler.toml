@@ -1,0 +1,10 @@
+name = "dj-ozzy-entertainment"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "EVENTS_KV"
+id = "729d26a5b92a4500a91a176f070d4225"
+preview_id = "3da8b023b68849b3bb8c9e6518a2cd02"
+
+[vars]
+ADMIN_PASSWORD = "admin123"

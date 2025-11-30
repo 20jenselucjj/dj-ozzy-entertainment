@@ -1,47 +1,84 @@
-import React from 'react';
-import { Calendar, MapPin } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, MapPin, Star } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 interface Event {
-  id: number;
+  id: string;
   title: string;
   date: string;
   location: string;
   image: string;
+  rating?: number;
 }
 
-const events: Event[] = [
-  {
-    id: 1,
-    title: "Summer Solstice Festival",
-    date: "June 21, 2023",
-    location: "Miami Beach, FL",
-    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1000&auto=format&fit=crop"
-  },
-  {
-    id: 2,
-    title: "Neon Nights Warehouse",
-    date: "August 15, 2023",
-    location: "Brooklyn, NY",
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop"
-  },
-  {
-    id: 3,
-    title: "Corporate Gala 2023",
-    date: "November 10, 2023",
-    location: "Los Angeles, CA",
-    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1000&auto=format&fit=crop"
-  },
-  {
-    id: 4,
-    title: "Underground Beats",
-    date: "December 31, 2023",
-    location: "London, UK",
-    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop"
-  }
-];
+const defaultEvents: Event[] = [];
 
 const PastEventsSection: React.FC = () => {
+  const [events, setEvents] = useState<Event[]>(defaultEvents);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch('/api/events')
+      .then(res => res.json())
+      .then(data => {
+        if (data.events && data.events.length > 0) {
+          setEvents(data.events);
+        }
+      })
+      .catch(() => {
+        // Keep default events on error
+      });
+  }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (events.length <= 4) return; // Don't auto-scroll if 4 or fewer events
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        const maxIndex = events.length - 4;
+        return prevIndex >= maxIndex ? 0 : prevIndex + 1;
+      });
+    }, 6000); // Scroll every 6 seconds (gives time to see the slow animation)
+
+    return () => clearInterval(interval);
+  }, [events.length]);
+
+  // Smooth scroll to current index with custom animation
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = 280;
+      const isMobile = window.innerWidth < 768;
+      const gap = isMobile ? 16 : 32;
+      const targetPosition = currentIndex * (cardWidth + gap);
+      const startPosition = container.scrollLeft;
+      const distance = targetPosition - startPosition;
+      const duration = 1500; // 1.5 seconds for smooth transition
+      let startTime: number | null = null;
+
+      const easeInOutCubic = (t: number): number => {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      };
+
+      const animateScroll = (currentTime: number) => {
+        if (startTime === null) startTime = currentTime;
+        const timeElapsed = currentTime - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+        const ease = easeInOutCubic(progress);
+        
+        container.scrollLeft = startPosition + distance * ease;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        }
+      };
+
+      requestAnimationFrame(animateScroll);
+    }
+  }, [currentIndex]);
+
   return (
     <section className="w-full max-w-[1440px] mx-auto py-16 md:py-24 px-4 md:px-8 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
       <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 text-center md:text-left">
@@ -60,35 +97,83 @@ const PastEventsSection: React.FC = () => {
         </FadeIn>
       </div>
 
-      <div className="flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-8">
-        {events.map((event) => (
-          <div key={event.id} className="group relative cursor-pointer overflow-hidden h-full md:flex-1 md:min-w-[200px]">
-             {/* Card Content */}
-             <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                <img 
-                    src={event.image} 
-                    alt={`${event.title} - DJ event at ${event.location} featuring live music and entertainment`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-             </div>
-             
-             {/* Overlay Text */}
-             <div className="mt-4">
-                <h3 className="font-serif text-xl mb-1 group-hover:underline decoration-1 underline-offset-4">{event.title}</h3>
-                <div className="flex flex-col gap-1 text-xs uppercase tracking-wide text-gray-500">
-                    <div className="flex items-center gap-2">
-                        <Calendar size={12} />
-                        <span>{event.date}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <MapPin size={12} />
-                        <span>{event.location}</span>
-                    </div>
-                </div>
-             </div>
+      <style>{`
+        .smooth-scroll-carousel {
+          scroll-behavior: smooth;
+          transition: scroll-left 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+      `}</style>
+      
+      <div className="overflow-hidden">
+        <div 
+          ref={scrollContainerRef}
+          className="overflow-x-auto hide-scrollbar mx-auto smooth-scroll-carousel"
+          style={{ 
+            maxWidth: 'min(100%, calc(280px * 4 + 32px * 3))',
+            scrollBehavior: 'smooth'
+          }}
+          onMouseEnter={() => setCurrentIndex(currentIndex)} // Pause on hover
+        >
+          <div className="flex gap-4 md:gap-8 pb-4">
+          {events.map((event) => (
+            <div key={event.id} className="group relative cursor-pointer overflow-hidden flex-shrink-0 w-[280px] first:ml-4 md:first:ml-0">
+               {/* Card Content */}
+               <div className="aspect-[3/4] overflow-hidden bg-gray-200">
+                  <img 
+                      src={event.image} 
+                      alt={`${event.title} - DJ event at ${event.location} featuring live music and entertainment`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+               </div>
+               
+               {/* Overlay Text */}
+               <div className="mt-4">
+                  <h3 className="font-serif text-xl mb-1 group-hover:underline decoration-1 underline-offset-4">{event.title}</h3>
+                  <div className="flex flex-col gap-1 text-xs uppercase tracking-wide text-gray-500">
+                      <div className="flex items-center gap-2">
+                          <Calendar size={12} />
+                          <span>{event.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                          <MapPin size={12} />
+                          <span>{event.location}</span>
+                      </div>
+                      {event.rating && event.rating > 0 && (
+                        <div className="flex items-center gap-2 mt-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              size={14}
+                              className={star <= event.rating! ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                            />
+                          ))}
+                        </div>
+                      )}
+                  </div>
+               </div>
+            </div>
+          ))}
           </div>
-        ))}
+        </div>
       </div>
+
+      {/* Navigation Dots */}
+      {events.length > 4 && (
+        <div className="flex justify-center gap-2 mt-8">
+          {Array.from({ length: events.length - 3 }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex 
+                  ? 'w-8 bg-brand-dark' 
+                  : 'w-2 bg-gray-300 hover:bg-gray-400'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

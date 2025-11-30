@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import HomePage from './components/HomePage';
 import AboutPage from './components/AboutPage';
+import AdminPage from './components/AdminPage';
 import Footer from './components/Footer';
 
 const App: React.FC = () => {
@@ -111,6 +112,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
 
