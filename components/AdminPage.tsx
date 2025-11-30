@@ -950,6 +950,7 @@ const AdminPage: React.FC = () => {
                 </label>
               </div>
             </div>
+            </div>
 
             {/* Save Button - Always visible */}
             <div className="sticky bottom-8 flex justify-end gap-4 bg-brand-beige/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-black/10">
