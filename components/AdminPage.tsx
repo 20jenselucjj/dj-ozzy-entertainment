@@ -8,6 +8,8 @@ interface Event {
   location: string;
   image: string;
   rating?: number;
+  mediaType?: 'image' | 'video';
+  videoUrl?: string;
 }
 
 interface FormEvent extends Event {
@@ -19,6 +21,30 @@ interface SiteSettings {
   aboutImage: string;
   partyImage: string;
   meImage: string;
+  
+  // Image Media Types
+  aboutImageType?: 'image' | 'video';
+  partyImageType?: 'image' | 'video';
+  meImageType?: 'image' | 'video';
+  
+  // Video URLs
+  aboutVideoUrl?: string;
+  partyVideoUrl?: string;
+  meVideoUrl?: string;
+  
+  // Video Settings
+  aboutVideoAutoplay?: boolean;
+  aboutVideoMuted?: boolean;
+  aboutVideoLoop?: boolean;
+  aboutVideoControls?: boolean;
+  partyVideoAutoplay?: boolean;
+  partyVideoMuted?: boolean;
+  partyVideoLoop?: boolean;
+  partyVideoControls?: boolean;
+  meVideoAutoplay?: boolean;
+  meVideoMuted?: boolean;
+  meVideoLoop?: boolean;
+  meVideoControls?: boolean;
   
   // Hero Section
   heroLine1: string;
@@ -49,16 +75,12 @@ interface SiteSettings {
   service3Subtitle: string;
   service3Description: string;
   
-  // Contact
-  contactTitle: string;
-  contactDescription: string;
-  contactLocation: string;
-  contactEmail: string;
-  contactPhone: string;
-  
   // SEO
   siteTitle: string;
   siteDescription: string;
+  
+  // Social Media
+  instagramUrl: string;
 }
 
 const AdminPage: React.FC = () => {
@@ -69,7 +91,7 @@ const AdminPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'events' | 'settings'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'settings'>('settings');
   const [settings, setSettings] = useState<SiteSettings>({
     // Images
     aboutImage: '/About.png',
@@ -105,16 +127,14 @@ const AdminPage: React.FC = () => {
     service3Subtitle: 'Keeping It Live',
     service3Description: "I know when to turn it up and when to bring it down. I'll watch the crowd and adjust on the fly to make sure everyone's having a good time, not just standing around.",
     
-    // Contact
-    contactTitle: "Let's Make It Happen",
-    contactDescription: "Got an event coming up? Whether it's a school dance, birthday party, or any celebration in Southern Utah, hit me up and let's talk about making it unforgettable. I'm flexible with dates and budgets.",
-    contactLocation: 'Southern Utah',
-    contactEmail: 'djozzyentertainment@gmail.com',
-    contactPhone: '+1 (435) 862-4679',
+
     
     // SEO
     siteTitle: 'DJ Ozzy | DJ Ozzy Entertainment - Southern Utah DJ Services',
-    siteDescription: 'DJ Ozzy - Professional DJ services in Southern Utah for weddings, school dances, corporate events, and parties. Book DJ Ozzy Entertainment for unforgettable entertainment experiences.'
+    siteDescription: 'DJ Ozzy - Professional DJ services in Southern Utah for weddings, school dances, corporate events, and parties. Book DJ Ozzy Entertainment for unforgettable entertainment experiences.',
+    
+    // Social Media
+    instagramUrl: 'https://instagram.com/djozzy'
   });
   const [settingsPreview, setSettingsPreview] = useState<Partial<SiteSettings>>({});
 
@@ -244,6 +264,12 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const extractYouTubeId = (url: string): string => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
+  };
+
   const handleSave = async () => {
     if (!editingEvent) return;
     
@@ -251,8 +277,8 @@ const AdminPage: React.FC = () => {
     try {
       let imageUrl = editingEvent.image;
       
-      // Upload image if a new file was selected
-      if (editingEvent.imageFile) {
+      // Upload image if a new file was selected (only for image type)
+      if (editingEvent.mediaType !== 'video' && editingEvent.imageFile) {
         const formData = new FormData();
         formData.append('image', editingEvent.imageFile);
         
@@ -277,7 +303,9 @@ const AdminPage: React.FC = () => {
         date: editingEvent.date,
         location: editingEvent.location,
         image: imageUrl,
-        rating: editingEvent.rating || 0
+        rating: editingEvent.rating || 0,
+        mediaType: editingEvent.mediaType || 'image',
+        videoUrl: editingEvent.videoUrl || ''
       };
       
       const token = sessionStorage.getItem('adminToken');
@@ -373,16 +401,6 @@ const AdminPage: React.FC = () => {
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-black/10">
           <button
-            onClick={() => setActiveTab('events')}
-            className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
-              activeTab === 'events'
-                ? 'border-b-2 border-brand-dark text-brand-dark'
-                : 'text-gray-500 hover:text-brand-dark'
-            }`}
-          >
-            Events
-          </button>
-          <button
             onClick={() => setActiveTab('settings')}
             className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
               activeTab === 'settings'
@@ -391,6 +409,16 @@ const AdminPage: React.FC = () => {
             }`}
           >
             Site Settings
+          </button>
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
+              activeTab === 'events'
+                ? 'border-b-2 border-brand-dark text-brand-dark'
+                : 'text-gray-500 hover:text-brand-dark'
+            }`}
+          >
+            Events
           </button>
         </div>
 
@@ -485,33 +513,90 @@ const AdminPage: React.FC = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Event Image</label>
-                  
-                  {/* Image Preview */}
-                  {(imagePreview || editingEvent.image) && (
-                    <div className="mb-4 relative aspect-[3/4] w-48 mx-auto overflow-hidden rounded-lg border border-black/10 shadow-md">
-                      <img 
-                        src={imagePreview || editingEvent.image} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover"
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Media Type</label>
+                  <div className="flex gap-4 mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="mediaType"
+                        value="image"
+                        checked={editingEvent.mediaType !== 'video'}
+                        onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'image', videoUrl: '' })}
+                        className="w-4 h-4"
                       />
+                      <span>Image</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="mediaType"
+                        value="video"
+                        checked={editingEvent.mediaType === 'video'}
+                        onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'video' })}
+                        className="w-4 h-4"
+                      />
+                      <span>Video</span>
+                    </label>
+                  </div>
+
+                  {editingEvent.mediaType === 'video' ? (
+                    <div>
+                      {/* Video Preview */}
+                      {(imagePreview || editingEvent.image) && (imagePreview.startsWith('data:video') || editingEvent.image.startsWith('data:video')) && (
+                        <div className="mb-4 relative aspect-[3/4] w-48 mx-auto overflow-hidden rounded-lg border border-black/10 shadow-md">
+                          <video 
+                            src={imagePreview || editingEvent.image} 
+                            className="w-full h-full object-cover"
+                            controls
+                            playsInline
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Upload Button */}
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-black/20 rounded-lg cursor-pointer hover:border-brand-dark hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                          <p className="text-sm text-gray-600 font-medium">Click to upload video</p>
+                          <p className="text-xs text-gray-500 mt-1">MP4, WebM under 25MB (5-10 sec)</p>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="video/*"
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* Image Preview */}
+                      {(imagePreview || editingEvent.image) && (
+                        <div className="mb-4 relative aspect-[3/4] w-48 mx-auto overflow-hidden rounded-lg border border-black/10 shadow-md">
+                          <img 
+                            src={imagePreview || editingEvent.image} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Upload Button */}
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-black/20 rounded-lg cursor-pointer hover:border-brand-dark hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-2 text-gray-500" />
+                          <p className="text-sm text-gray-600 font-medium">Click to upload image</p>
+                          <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={handleImageChange}
+                        />
+                      </label>
                     </div>
                   )}
-                  
-                  {/* Upload Button */}
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-black/20 rounded-lg cursor-pointer hover:border-brand-dark hover:bg-gray-50 transition-colors">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                      <p className="text-sm text-gray-600 font-medium">Click to upload image</p>
-                      <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 10MB</p>
-                    </div>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </label>
                 </div>
                 
                 <button
@@ -530,11 +615,20 @@ const AdminPage: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="bg-white rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden border border-black/10 group hover:shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-shadow">
               <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                <img 
-                  src={event.image} 
-                  alt={event.title} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {event.mediaType === 'video' && event.videoUrl ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${extractYouTubeId(event.videoUrl)}`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <img 
+                    src={event.image} 
+                    alt={event.title} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
               </div>
               <div className="p-6">
                 <h3 className="font-serif text-xl mb-3 text-brand-dark">{event.title}</h3>
@@ -575,9 +669,9 @@ const AdminPage: React.FC = () => {
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="space-y-12">
-            {/* SEO Settings */}
+            {/* SEO & Social Settings */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <h2 className="font-serif text-2xl text-brand-dark mb-6">SEO & Meta</h2>
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">SEO & Social Media</h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Site Title</label>
@@ -596,6 +690,17 @@ const AdminPage: React.FC = () => {
                     rows={3}
                     className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Instagram URL</label>
+                  <input
+                    type="url"
+                    value={settings.instagramUrl}
+                    onChange={(e) => setSettings({ ...settings, instagramUrl: e.target.value })}
+                    placeholder="https://instagram.com/yourusername"
+                    className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Full Instagram profile URL</p>
                 </div>
               </div>
             </div>
@@ -663,6 +768,7 @@ const AdminPage: React.FC = () => {
                     onChange={(e) => setSettings({ ...settings, aboutDescription: e.target.value })}
                     rows={4}
                     className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    placeholder="Enter description..."
                   />
                 </div>
               </div>
@@ -754,9 +860,9 @@ const AdminPage: React.FC = () => {
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
                     <textarea
-                      placeholder="Description"
                       value={settings.service1Description}
                       onChange={(e) => setSettings({ ...settings, service1Description: e.target.value })}
+                      placeholder="Description"
                       rows={3}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
@@ -781,9 +887,9 @@ const AdminPage: React.FC = () => {
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
                     <textarea
-                      placeholder="Description"
                       value={settings.service2Description}
                       onChange={(e) => setSettings({ ...settings, service2Description: e.target.value })}
+                      placeholder="Description"
                       rows={3}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
@@ -808,9 +914,9 @@ const AdminPage: React.FC = () => {
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
                     <textarea
-                      placeholder="Description"
                       value={settings.service3Description}
                       onChange={(e) => setSettings({ ...settings, service3Description: e.target.value })}
+                      placeholder="Description"
                       rows={3}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
@@ -819,9 +925,9 @@ const AdminPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Contact Information */}
+            {/* Contact/Booking Section */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <h2 className="font-serif text-2xl text-brand-dark mb-6">Contact Information</h2>
+              <h2 className="font-serif text-2xl text-brand-dark mb-6">Contact/Booking Section</h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Section Title</label>
@@ -830,6 +936,7 @@ const AdminPage: React.FC = () => {
                     value={settings.contactTitle}
                     onChange={(e) => setSettings({ ...settings, contactTitle: e.target.value })}
                     className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    placeholder="Let's Make It Happen"
                   />
                 </div>
                 <div>
@@ -839,9 +946,10 @@ const AdminPage: React.FC = () => {
                     onChange={(e) => setSettings({ ...settings, contactDescription: e.target.value })}
                     rows={3}
                     className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                    placeholder="Got an event coming up? Hit me up..."
                   />
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Location</label>
                     <input
@@ -849,6 +957,7 @@ const AdminPage: React.FC = () => {
                       value={settings.contactLocation}
                       onChange={(e) => setSettings({ ...settings, contactLocation: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                      placeholder="Southern Utah"
                     />
                   </div>
                   <div>
@@ -858,6 +967,7 @@ const AdminPage: React.FC = () => {
                       value={settings.contactEmail}
                       onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                      placeholder="djozzyentertainment@gmail.com"
                     />
                   </div>
                   <div>
@@ -867,6 +977,7 @@ const AdminPage: React.FC = () => {
                       value={settings.contactPhone}
                       onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                      placeholder="+1 (435) 862-4679"
                     />
                   </div>
                 </div>
@@ -881,73 +992,340 @@ const AdminPage: React.FC = () => {
               {/* About Image */}
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">About Page Hero</h3>
-                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
-                  <img 
-                    src={settingsPreview.aboutImage || settings.aboutImage} 
-                    alt="About page hero" 
-                    className="w-full h-full object-cover"
-                  />
+                
+                {/* Media Type Selection */}
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="aboutImageType"
+                      value="image"
+                      checked={settings.aboutImageType !== 'video'}
+                      onChange={() => setSettings({ ...settings, aboutImageType: 'image', aboutVideoUrl: '' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Image</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="aboutImageType"
+                      value="video"
+                      checked={settings.aboutImageType === 'video'}
+                      onChange={() => setSettings({ ...settings, aboutImageType: 'video' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Video</span>
+                  </label>
                 </div>
-                <label className="block">
-                  <span className="sr-only">Choose image</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleSettingsImageChange('aboutImage', file);
-                    }}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
-                  />
-                </label>
+
+                {settings.aboutImageType === 'video' ? (
+                  <div>
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                    </div>
+                    {(settingsPreview.aboutImage || settings.aboutImage) && settings.aboutImage.startsWith('data:video') ? (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <video 
+                          src={settingsPreview.aboutImage || settings.aboutImage}
+                          className="w-full h-full object-cover"
+                          autoPlay={settings.aboutVideoAutoplay !== false}
+                          muted={settings.aboutVideoMuted !== false}
+                          loop={settings.aboutVideoLoop !== false}
+                          controls={settings.aboutVideoControls || false}
+                          playsInline
+                        />
+                      </div>
+                    ) : null}
+                    <label className="block">
+                      <span className="sr-only">Choose video</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('aboutImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">MP4, WebM under 25MB (5-10 sec recommended)</p>
+                    </label>
+                  </div>
+                ) : (
+                  <>
+                    <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                      <img 
+                        src={settingsPreview.aboutImage || settings.aboutImage} 
+                        alt="About page hero" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <label className="block">
+                      <span className="sr-only">Choose image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('aboutImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                    </label>
+                  </>
+                )}
               </div>
 
               {/* Party Image */}
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Party Atmosphere</h3>
-                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
-                  <img 
-                    src={settingsPreview.partyImage || settings.partyImage} 
-                    alt="Party atmosphere" 
-                    className="w-full h-full object-cover"
-                  />
+                
+                {/* Media Type Selection */}
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="partyImageType"
+                      value="image"
+                      checked={settings.partyImageType !== 'video'}
+                      onChange={() => setSettings({ ...settings, partyImageType: 'image', partyVideoUrl: '' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Image</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="partyImageType"
+                      value="video"
+                      checked={settings.partyImageType === 'video'}
+                      onChange={() => setSettings({ ...settings, partyImageType: 'video' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Video</span>
+                  </label>
                 </div>
-                <label className="block">
-                  <span className="sr-only">Choose image</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleSettingsImageChange('partyImage', file);
-                    }}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
-                  />
-                </label>
+
+                {settings.partyImageType === 'video' ? (
+                  <div>
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                    </div>
+                    {(settingsPreview.partyImage || settings.partyImage) && settings.partyImage.startsWith('data:video') ? (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <video 
+                          src={settingsPreview.partyImage || settings.partyImage}
+                          className="w-full h-full object-cover"
+                          autoPlay={settings.partyVideoAutoplay !== false}
+                          muted={settings.partyVideoMuted !== false}
+                          loop={settings.partyVideoLoop !== false}
+                          controls={settings.partyVideoControls || false}
+                          playsInline
+                        />
+                      </div>
+                    ) : null}
+                    <label className="block">
+                      <span className="sr-only">Choose video</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('partyImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">MP4, WebM under 25MB (5-10 sec recommended)</p>
+                    </label>
+                  </div>
+                ) : (
+                  <>
+                    <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                      <img 
+                        src={settingsPreview.partyImage || settings.partyImage} 
+                        alt="Party atmosphere" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <label className="block">
+                      <span className="sr-only">Choose image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('partyImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                    </label>
+                  </>
+                )}
               </div>
 
               {/* Me Image */}
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Homepage About Section</h3>
-                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
-                  <img 
-                    src={settingsPreview.meImage || settings.meImage} 
-                    alt="DJ performing" 
-                    className="w-full h-full object-cover"
-                  />
+                
+                {/* Media Type Selection */}
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="meImageType"
+                      value="image"
+                      checked={settings.meImageType !== 'video'}
+                      onChange={() => setSettings({ ...settings, meImageType: 'image', meVideoUrl: '' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Image</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="meImageType"
+                      value="video"
+                      checked={settings.meImageType === 'video'}
+                      onChange={() => setSettings({ ...settings, meImageType: 'video' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Video</span>
+                  </label>
                 </div>
-                <label className="block">
-                  <span className="sr-only">Choose image</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleSettingsImageChange('meImage', file);
-                    }}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
-                  />
-                </label>
+
+                {settings.meImageType === 'video' ? (
+                  <div>
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                    </div>
+                    {(settingsPreview.meImage || settings.meImage) && settings.meImage.startsWith('data:video') ? (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <video 
+                          src={settingsPreview.meImage || settings.meImage}
+                          className="w-full h-full object-cover"
+                          autoPlay={settings.meVideoAutoplay !== false}
+                          muted={settings.meVideoMuted !== false}
+                          loop={settings.meVideoLoop !== false}
+                          controls={settings.meVideoControls || false}
+                          playsInline
+                        />
+                      </div>
+                    ) : null}
+                    <label className="block">
+                      <span className="sr-only">Choose video</span>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('meImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">MP4, WebM under 25MB (5-10 sec recommended)</p>
+                    </label>
+                  </div>
+                ) : (
+                  <>
+                    <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                      <img 
+                        src={settingsPreview.meImage || settings.meImage} 
+                        alt="DJ performing" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <label className="block">
+                      <span className="sr-only">Choose image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSettingsImageChange('meImage', file);
+                        }}
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                      />
+                    </label>
+                  </>
+                )}
               </div>
             </div>
             </div>

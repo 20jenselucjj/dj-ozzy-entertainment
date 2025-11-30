@@ -5,9 +5,21 @@ import FadeIn from './FadeIn';
 const AboutSection: React.FC = () => {
   const [content, setContent] = React.useState({
     meImage: '/me.png',
+    meImageType: 'image' as 'image' | 'video',
+    meVideoUrl: '',
+    meVideoAutoplay: true,
+    meVideoMuted: true,
+    meVideoLoop: true,
+    meVideoControls: false,
     aboutTitle: 'Your Event, Your Vibe',
     aboutDescription: "I get it—you want music that actually hits. No awkward silences, no outdated playlists, just the songs you and your friends actually want to hear. Whether it's a school dance, party, or any event in Southern Utah, I'll bring the energy and keep everyone on the dance floor all night."
   });
+
+  const extractYouTubeId = (url: string): string => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
+  };
 
   React.useEffect(() => {
     fetch('/api/settings')
@@ -16,6 +28,12 @@ const AboutSection: React.FC = () => {
         if (data.settings) {
           setContent({
             meImage: data.settings.meImage || '/me.png',
+            meImageType: data.settings.meImageType || 'image',
+            meVideoUrl: data.settings.meVideoUrl || '',
+            meVideoAutoplay: data.settings.meVideoAutoplay !== false,
+            meVideoMuted: data.settings.meVideoMuted !== false,
+            meVideoLoop: data.settings.meVideoLoop !== false,
+            meVideoControls: data.settings.meVideoControls || false,
             aboutTitle: data.settings.aboutTitle,
             aboutDescription: data.settings.aboutDescription
           });
@@ -60,13 +78,24 @@ const AboutSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Image Column */}
+        {/* Right Image/Video Column */}
         <div className="md:w-2/3 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
-          <img 
-            src={content.meImage} 
-            alt="DJ Ozzy performing at an event with professional DJ equipment and lighting setup" 
-            className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
-          />
+          {(content.meImageType === 'video' || content.meImage.startsWith('data:video')) ? (
+            <video
+              src={content.meImage}
+              className="w-full h-full object-cover"
+              autoPlay={content.meVideoAutoplay}
+              muted={content.meVideoMuted}
+              loop={content.meVideoLoop}
+              playsInline
+            />
+          ) : (
+            <img 
+              src={content.meImage} 
+              alt="DJ Ozzy performing at an event with professional DJ equipment and lighting setup" 
+              className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
+            />
+          )}
           {/* Overlay gradient for style */}
           <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/40 to-transparent pointer-events-none opacity-50"></div>
         </div>

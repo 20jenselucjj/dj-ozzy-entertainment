@@ -30,9 +30,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       });
     }
 
-    // Check file size (limit to 5MB for KV)
-    if (image.size > 5 * 1024 * 1024) {
-      return new Response(JSON.stringify({ error: 'Image too large. Please use images under 5MB.' }), {
+    // Check file size (limit based on file type)
+    const isVideo = image.type.startsWith('video/');
+    const maxSize = isVideo ? 25 * 1024 * 1024 : 5 * 1024 * 1024; // 25MB for video, 5MB for images
+    
+    if (image.size > maxSize) {
+      return new Response(JSON.stringify({ 
+        error: isVideo 
+          ? 'Video too large. Please use videos under 25MB (5-10 seconds recommended).' 
+          : 'Image too large. Please use images under 5MB.' 
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });

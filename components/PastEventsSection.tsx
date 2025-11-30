@@ -9,6 +9,8 @@ interface Event {
   location: string;
   image: string;
   rating?: number;
+  mediaType?: 'image' | 'video';
+  videoUrl?: string;
 }
 
 const defaultEvents: Event[] = [];
@@ -17,6 +19,12 @@ const PastEventsSection: React.FC = () => {
   const [events, setEvents] = useState<Event[]>(defaultEvents);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  const extractYouTubeId = (url: string): string => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
+  };
 
   useEffect(() => {
     fetch('/api/events')
@@ -119,11 +127,20 @@ const PastEventsSection: React.FC = () => {
             <div key={event.id} className="group relative cursor-pointer overflow-hidden flex-shrink-0 w-[280px] first:ml-4 md:first:ml-0">
                {/* Card Content */}
                <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                  <img 
-                      src={event.image} 
-                      alt={`${event.title} - DJ event at ${event.location} featuring live music and entertainment`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
+                  {(event.mediaType === 'video' || event.image.startsWith('data:video')) ? (
+                    <video
+                      src={event.image}
+                      className="w-full h-full object-cover"
+                      controls
+                      playsInline
+                    />
+                  ) : (
+                    <img 
+                        src={event.image} 
+                        alt={`${event.title} - DJ event at ${event.location} featuring live music and entertainment`}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  )}
                </div>
                
                {/* Overlay Text */}
