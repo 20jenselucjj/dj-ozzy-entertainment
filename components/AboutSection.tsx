@@ -3,6 +3,19 @@ import { ArrowRight } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const AboutSection: React.FC = () => {
+  const [meImage, setMeImage] = React.useState('/me.png');
+
+  React.useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings?.meImage) {
+          setMeImage(data.settings.meImage);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const scrollToContact = () => {
     const element = document.getElementById('contact');
     if (element) {
@@ -42,7 +55,7 @@ const AboutSection: React.FC = () => {
         {/* Right Image Column */}
         <div className="md:w-2/3 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
           <img 
-            src="/me.png" 
+            src={meImage} 
             alt="DJ Ozzy performing at an event with professional DJ equipment and lighting setup" 
             className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
           />

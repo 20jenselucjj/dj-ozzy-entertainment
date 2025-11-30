@@ -14,6 +14,12 @@ interface FormEvent extends Event {
   imageFile?: File;
 }
 
+interface SiteSettings {
+  aboutImage: string;
+  partyImage: string;
+  meImage: string;
+}
+
 const AdminPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -22,6 +28,13 @@ const AdminPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'events' | 'settings'>('events');
+  const [settings, setSettings] = useState<SiteSettings>({
+    aboutImage: '/About.png',
+    partyImage: '/Party.png',
+    meImage: '/me.png'
+  });
+  const [settingsPreview, setSettingsPreview] = useState<Partial<SiteSettings>>({});
 
   // Check for existing session on mount
   useEffect(() => {
@@ -30,6 +43,12 @@ const AdminPage: React.FC = () => {
       setIsAuthenticated(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === 'settings') {
+      fetchSettings();
+    }
+  }, [isAuthenticated, activeTab]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -45,6 +64,63 @@ const AdminPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch events:', error);
     }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      const data = await response.json();
+      if (data.settings) {
+        setSettings(data.settings);
+      }
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  const handleSettingsImageChange = async (field: keyof SiteSettings, file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+      const uploadResponse = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (uploadResponse.ok) {
+        const { url } = await uploadResponse.json();
+        setSettingsPreview({ ...settingsPreview, [field]: url });
+      }
+    } catch (error) {
+      alert('Failed to upload image');
+    }
+  };
+
+  const saveSettings = async () => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('adminToken');
+      const updatedSettings = { ...settings, ...settingsPreview };
+      
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ settings: updatedSettings })
+      });
+      
+      if (response.ok) {
+        setSettings(updatedSettings);
+        setSettingsPreview({});
+        alert('Settings saved! Refresh the page to see changes.');
+      }
+    } catch (error) {
+      alert('Failed to save settings');
+    }
+    setLoading(false);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -196,22 +272,62 @@ const AdminPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-brand-beige p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-8">
           <div>
             <span className="text-xs font-bold tracking-widest uppercase text-gray-500 mb-2 block">Admin Panel</span>
-            <h1 className="font-serif text-4xl md:text-5xl text-brand-dark">Manage Events</h1>
+            <h1 className="font-serif text-4xl md:text-5xl text-brand-dark">Dashboard</h1>
           </div>
           <button
             onClick={() => {
-              setIsEditing(true);
-              setEditingEvent({ id: '', title: '', date: '', location: '', image: '', rating: 0 });
-              setImagePreview('');
+              sessionStorage.removeItem('adminToken');
+              setIsAuthenticated(false);
             }}
-            className="flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded hover:bg-black transition-colors font-medium tracking-wide"
+            className="text-sm text-gray-600 hover:text-brand-dark"
           >
-            <Plus size={20} /> Add Event
+            Logout
           </button>
         </div>
+
+        {/* Tabs */}
+        <div className="flex gap-4 mb-8 border-b border-black/10">
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
+              activeTab === 'events'
+                ? 'border-b-2 border-brand-dark text-brand-dark'
+                : 'text-gray-500 hover:text-brand-dark'
+            }`}
+          >
+            Events
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
+              activeTab === 'settings'
+                ? 'border-b-2 border-brand-dark text-brand-dark'
+                : 'text-gray-500 hover:text-brand-dark'
+            }`}
+          >
+            Site Settings
+          </button>
+        </div>
+
+        {/* Events Tab */}
+        {activeTab === 'events' && (
+          <>
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="font-serif text-2xl text-brand-dark">Manage Events</h2>
+              <button
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditingEvent({ id: '', title: '', date: '', location: '', image: '', rating: 0 });
+                  setImagePreview('');
+                }}
+                className="flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded hover:bg-black transition-colors font-medium tracking-wide"
+              >
+                <Plus size={20} /> Add Event
+              </button>
+            </div>
 
         {isEditing && editingEvent && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -371,6 +487,107 @@ const AdminPage: React.FC = () => {
             </div>
           ))}
         </div>
+          </>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div className="space-y-8">
+            <h2 className="font-serif text-2xl text-brand-dark mb-6">About Page Images</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* About Image */}
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">About Page Hero</h3>
+                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                  <img 
+                    src={settingsPreview.aboutImage || settings.aboutImage} 
+                    alt="About page hero" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <label className="block">
+                  <span className="sr-only">Choose image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleSettingsImageChange('aboutImage', file);
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                  />
+                </label>
+              </div>
+
+              {/* Party Image */}
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Party Atmosphere</h3>
+                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                  <img 
+                    src={settingsPreview.partyImage || settings.partyImage} 
+                    alt="Party atmosphere" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <label className="block">
+                  <span className="sr-only">Choose image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleSettingsImageChange('partyImage', file);
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                  />
+                </label>
+              </div>
+
+              {/* Me Image */}
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Homepage About Section</h3>
+                <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                  <img 
+                    src={settingsPreview.meImage || settings.meImage} 
+                    alt="DJ performing" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <label className="block">
+                  <span className="sr-only">Choose image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleSettingsImageChange('meImage', file);
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-brand-beige file:text-brand-dark hover:file:bg-gray-200"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {Object.keys(settingsPreview).length > 0 && (
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setSettingsPreview({})}
+                  className="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveSettings}
+                  disabled={loading}
+                  className="px-6 py-3 bg-brand-dark text-white rounded hover:bg-black transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

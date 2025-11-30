@@ -5,6 +5,24 @@ import FadeIn from './FadeIn';
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
+  const [images, setImages] = React.useState({
+    aboutImage: '/About.png',
+    partyImage: '/Party.png'
+  });
+
+  React.useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.settings) {
+          setImages({
+            aboutImage: data.settings.aboutImage,
+            partyImage: data.settings.partyImage
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const scrollToContact = () => {
     navigate('/');
@@ -23,7 +41,7 @@ const AboutPage: React.FC = () => {
         {/* Hero Image */}
         <div className="relative overflow-hidden pt-4">
           <img 
-            src="/About.png" 
+            src={images.aboutImage} 
             alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
             className="w-full h-auto"
           />
@@ -66,7 +84,7 @@ const AboutPage: React.FC = () => {
         {/* Party Image */}
         <div className="relative h-[40vh] overflow-hidden">
           <img 
-            src="/Party.png" 
+            src={images.partyImage} 
             alt="Energetic party atmosphere with crowd dancing at DJ Ozzy event in Southern Utah" 
             className="w-full h-full object-cover object-center"
           />
@@ -112,7 +130,7 @@ const AboutPage: React.FC = () => {
         <div className="relative flex flex-col">
           <div className="relative overflow-hidden">
             <img 
-              src="/About.png" 
+              src={images.aboutImage} 
               alt="DJ Ozzy - Professional DJ and former Student Body President at Snow Canyon High School" 
               className="w-full h-auto hover:scale-105 transition-all duration-700 ease-in-out"
             />
@@ -123,7 +141,7 @@ const AboutPage: React.FC = () => {
           
           <div className="relative h-1/2 overflow-hidden">
             <img 
-              src="/Party.png" 
+              src={images.partyImage} 
               alt="Energetic party atmosphere with crowd dancing at DJ Ozzy event in Southern Utah" 
               className="w-full h-full object-cover object-center hover:scale-105 transition-all duration-700 ease-in-out"
             />
