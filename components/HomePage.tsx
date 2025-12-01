@@ -3,6 +3,7 @@ import HeroSection from './HeroSection';
 import AboutSection from './AboutSection';
 import ServicesSection from './ServicesSection';
 import PastEventsSection from './PastEventsSection';
+import ReviewsSection from './ReviewsSection';
 import ContactSection from './ContactSection';
 
 const HomePage: React.FC = () => {
@@ -22,6 +23,10 @@ const HomePage: React.FC = () => {
 
       <div id="events">
         <PastEventsSection />
+      </div>
+
+      <div id="reviews">
+        <ReviewsSection />
       </div>
 
       <div id="contact">

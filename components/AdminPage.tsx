@@ -16,6 +16,15 @@ interface FormEvent extends Event {
   imageFile?: File;
 }
 
+interface Review {
+  id: string;
+  name: string;
+  profileImage: string;
+  rating: number;
+  text: string;
+  date: string;
+}
+
 interface SiteSettings {
   // Images
   aboutImage: string;
@@ -67,13 +76,13 @@ interface SiteSettings {
   servicesSubtitle: string;
   service1Title: string;
   service1Subtitle: string;
-  service1Description: string;
+  service1Description: string | string[];
   service2Title: string;
   service2Subtitle: string;
-  service2Description: string;
+  service2Description: string | string[];
   service3Title: string;
   service3Subtitle: string;
-  service3Description: string;
+  service3Description: string | string[];
   
   // SEO
   siteTitle: string;
@@ -81,6 +90,10 @@ interface SiteSettings {
   
   // Social Media
   instagramUrl: string;
+  
+  // Reviews
+  reviews?: Review[];
+  showReviews?: boolean;
 }
 
 const AdminPage: React.FC = () => {
@@ -91,7 +104,7 @@ const AdminPage: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'events' | 'settings'>('settings');
+  const [activeTab, setActiveTab] = useState<'events' | 'settings' | 'reviews'>('settings');
   const [settings, setSettings] = useState<SiteSettings>({
     // Images
     aboutImage: '/About.png',
@@ -117,15 +130,32 @@ const AdminPage: React.FC = () => {
     // Services
     servicesTitle: 'What I Bring',
     servicesSubtitle: 'Everything you need for an epic night without the hassle or crazy prices.',
-    service1Title: 'Your Music, Your Way',
-    service1Subtitle: 'Custom Playlists',
-    service1Description: "Tell me what you want to hear and I'll make it happen. Whether you're into the latest hits, throwbacks, or a mix of everything, I'll put together a playlist that keeps everyone vibing all night long.",
-    service2Title: 'Quality Sound & Lights',
-    service2Subtitle: 'Professional Setup',
-    service2Description: "I bring legit equipment that sounds amazing and looks even better. Clear audio, awesome lighting effects—everything you need to turn your venue into the place to be.",
-    service3Title: 'Reading the Room',
-    service3Subtitle: 'Keeping It Live',
-    service3Description: "I know when to turn it up and when to bring it down. I'll watch the crowd and adjust on the fly to make sure everyone's having a good time, not just standing around.",
+    service1Title: 'Energy you can feel',
+    service1Subtitle: 'CUSTOM PLAYLISTS',
+    service1Description: [
+      "High energy MC that gets crowd hyped",
+      "A DJ who actually KNOWS what the students want",
+      "Real connection with guests",
+      "A DJ who has planed over 10 dances and understands dances from YOUR side"
+    ],
+    service2Title: 'Music Made for the Moment',
+    service2Subtitle: 'PROFESSIONAL SETUP',
+    service2Description: [
+      "Clean, school appropriate music only",
+      "Live mashups & Transitions (no dead air)",
+      "Tailored playlists for each event",
+      "Fresh, updated music - No outdated dance tracks",
+      "Highly crowd interactive playing"
+    ],
+    service3Title: 'Honest, Simple, Affordable',
+    service3Subtitle: 'KEEPING IT LIVE',
+    service3Description: [
+      "Pricing designed specifically for the event",
+      "Flexible packages for budgets big and small",
+      "On time dependable DJ",
+      "Transparent upfront rate - No surprise fees",
+      "Professional contract + payment"
+    ],
     
 
     
@@ -134,7 +164,11 @@ const AdminPage: React.FC = () => {
     siteDescription: 'DJ Ozzy - Professional DJ services in Southern Utah for weddings, school dances, corporate events, and parties. Book DJ Ozzy Entertainment for unforgettable entertainment experiences.',
     
     // Social Media
-    instagramUrl: 'https://instagram.com/djozzy'
+    instagramUrl: 'https://instagram.com/djozzy',
+    
+    // Reviews
+    reviews: [],
+    showReviews: true
   });
   const [settingsPreview, setSettingsPreview] = useState<Partial<SiteSettings>>({});
 
@@ -297,13 +331,13 @@ const AdminPage: React.FC = () => {
         }
       }
       
-      const eventToSave = {
+      const eventToSave: Event = {
         id: editingEvent.id || Date.now().toString(),
         title: editingEvent.title,
         date: editingEvent.date,
         location: editingEvent.location,
         image: imageUrl,
-        rating: editingEvent.rating || 0,
+        ...(editingEvent.rating && editingEvent.rating > 0 ? { rating: editingEvent.rating } : {}),
         mediaType: editingEvent.mediaType || 'image',
         videoUrl: editingEvent.videoUrl || ''
       };
@@ -420,6 +454,16 @@ const AdminPage: React.FC = () => {
           >
             Events
           </button>
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`pb-3 px-4 font-medium tracking-wide transition-colors ${
+              activeTab === 'reviews'
+                ? 'border-b-2 border-brand-dark text-brand-dark'
+                : 'text-gray-500 hover:text-brand-dark'
+            }`}
+          >
+            Reviews
+          </button>
         </div>
 
         {/* Events Tab */}
@@ -430,7 +474,7 @@ const AdminPage: React.FC = () => {
               <button
                 onClick={() => {
                   setIsEditing(true);
-                  setEditingEvent({ id: '', title: '', date: '', location: '', image: '', rating: 0 });
+                  setEditingEvent({ id: '', title: '', date: '', location: '', image: '' });
                   setImagePreview('');
                 }}
                 className="flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded hover:bg-black transition-colors font-medium tracking-wide"
@@ -859,13 +903,43 @@ const AdminPage: React.FC = () => {
                       onChange={(e) => setSettings({ ...settings, service1Subtitle: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
-                    <textarea
-                      value={settings.service1Description}
-                      onChange={(e) => setSettings({ ...settings, service1Description: e.target.value })}
-                      placeholder="Description"
-                      rows={3}
-                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Bullet Points</label>
+                      {(Array.isArray(settings.service1Description) ? settings.service1Description : [settings.service1Description]).map((bullet, index) => (
+                        <div key={index} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={bullet}
+                            onChange={(e) => {
+                              const newDesc = Array.isArray(settings.service1Description) ? [...settings.service1Description] : [settings.service1Description];
+                              newDesc[index] = e.target.value;
+                              setSettings({ ...settings, service1Description: newDesc });
+                            }}
+                            placeholder={`Bullet point ${index + 1}`}
+                            className="flex-1 px-4 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                          />
+                          <button
+                            onClick={() => {
+                              const newDesc = Array.isArray(settings.service1Description) ? [...settings.service1Description] : [settings.service1Description];
+                              newDesc.splice(index, 1);
+                              setSettings({ ...settings, service1Description: newDesc });
+                            }}
+                            className="px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-600 hover:text-white transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          const newDesc = Array.isArray(settings.service1Description) ? [...settings.service1Description, ''] : [settings.service1Description, ''];
+                          setSettings({ ...settings, service1Description: newDesc });
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-brand-beige rounded hover:bg-brand-dark hover:text-white transition-colors text-sm"
+                      >
+                        <Plus size={16} /> Add Bullet Point
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -886,13 +960,43 @@ const AdminPage: React.FC = () => {
                       onChange={(e) => setSettings({ ...settings, service2Subtitle: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
-                    <textarea
-                      value={settings.service2Description}
-                      onChange={(e) => setSettings({ ...settings, service2Description: e.target.value })}
-                      placeholder="Description"
-                      rows={3}
-                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Bullet Points</label>
+                      {(Array.isArray(settings.service2Description) ? settings.service2Description : [settings.service2Description]).map((bullet, index) => (
+                        <div key={index} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={bullet}
+                            onChange={(e) => {
+                              const newDesc = Array.isArray(settings.service2Description) ? [...settings.service2Description] : [settings.service2Description];
+                              newDesc[index] = e.target.value;
+                              setSettings({ ...settings, service2Description: newDesc });
+                            }}
+                            placeholder={`Bullet point ${index + 1}`}
+                            className="flex-1 px-4 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                          />
+                          <button
+                            onClick={() => {
+                              const newDesc = Array.isArray(settings.service2Description) ? [...settings.service2Description] : [settings.service2Description];
+                              newDesc.splice(index, 1);
+                              setSettings({ ...settings, service2Description: newDesc });
+                            }}
+                            className="px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-600 hover:text-white transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          const newDesc = Array.isArray(settings.service2Description) ? [...settings.service2Description, ''] : [settings.service2Description, ''];
+                          setSettings({ ...settings, service2Description: newDesc });
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-brand-beige rounded hover:bg-brand-dark hover:text-white transition-colors text-sm"
+                      >
+                        <Plus size={16} /> Add Bullet Point
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -913,13 +1017,43 @@ const AdminPage: React.FC = () => {
                       onChange={(e) => setSettings({ ...settings, service3Subtitle: e.target.value })}
                       className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
                     />
-                    <textarea
-                      value={settings.service3Description}
-                      onChange={(e) => setSettings({ ...settings, service3Description: e.target.value })}
-                      placeholder="Description"
-                      rows={3}
-                      className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Bullet Points</label>
+                      {(Array.isArray(settings.service3Description) ? settings.service3Description : [settings.service3Description]).map((bullet, index) => (
+                        <div key={index} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={bullet}
+                            onChange={(e) => {
+                              const newDesc = Array.isArray(settings.service3Description) ? [...settings.service3Description] : [settings.service3Description];
+                              newDesc[index] = e.target.value;
+                              setSettings({ ...settings, service3Description: newDesc });
+                            }}
+                            placeholder={`Bullet point ${index + 1}`}
+                            className="flex-1 px-4 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                          />
+                          <button
+                            onClick={() => {
+                              const newDesc = Array.isArray(settings.service3Description) ? [...settings.service3Description] : [settings.service3Description];
+                              newDesc.splice(index, 1);
+                              setSettings({ ...settings, service3Description: newDesc });
+                            }}
+                            className="px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-600 hover:text-white transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          const newDesc = Array.isArray(settings.service3Description) ? [...settings.service3Description, ''] : [settings.service3Description, ''];
+                          setSettings({ ...settings, service3Description: newDesc });
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-brand-beige rounded hover:bg-brand-dark hover:text-white transition-colors text-sm"
+                      >
+                        <Plus size={16} /> Add Bullet Point
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1349,6 +1483,223 @@ const AdminPage: React.FC = () => {
                 className="px-8 py-3 bg-brand-dark text-white rounded hover:bg-black transition-colors disabled:opacity-50 font-medium tracking-wide"
               >
                 {loading ? 'Saving...' : 'Save All Changes'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Reviews Tab */}
+        {activeTab === 'reviews' && (
+          <div className="space-y-8">
+            <div className="bg-white p-8 rounded-lg shadow-md">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-serif text-2xl text-brand-dark">Manage Reviews</h2>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.showReviews !== false}
+                      onChange={(e) => setSettings({ ...settings, showReviews: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-medium">Show Reviews Section</span>
+                  </label>
+                  <button
+                    onClick={() => {
+                      const newReview: Review = {
+                        id: Date.now().toString(),
+                        name: '',
+                        profileImage: 'https://via.placeholder.com/100',
+                        rating: 5,
+                        text: '',
+                        date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                      };
+                      setSettings({ 
+                        ...settings, 
+                        reviews: [...(settings.reviews || []), newReview] 
+                      });
+                    }}
+                    className="flex items-center gap-2 bg-brand-dark text-white px-6 py-3 rounded hover:bg-black transition-colors font-medium tracking-wide"
+                  >
+                    <Plus size={20} /> Add Review
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {(settings.reviews || []).map((review, index) => (
+                  <div key={review.id} className="border border-black/10 rounded-lg p-6 bg-brand-beige">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="font-medium text-lg">Review {index + 1}</h3>
+                      <button
+                        onClick={() => {
+                          if (confirm('Delete this review?')) {
+                            setSettings({
+                              ...settings,
+                              reviews: (settings.reviews || []).filter((_, i) => i !== index)
+                            });
+                          }
+                        }}
+                        className="text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Reviewer Name</label>
+                        <input
+                          type="text"
+                          value={review.name}
+                          onChange={(e) => {
+                            const newReviews = [...(settings.reviews || [])];
+                            newReviews[index] = { ...newReviews[index], name: e.target.value };
+                            setSettings({ ...settings, reviews: newReviews });
+                          }}
+                          placeholder="John Doe"
+                          className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Profile Image</label>
+                        <div className="flex gap-3 items-start">
+                          {review.profileImage && (
+                            <img 
+                              src={review.profileImage} 
+                              alt={review.name}
+                              className="w-16 h-16 rounded-full object-cover border-2 border-brand-dark"
+                            />
+                          )}
+                          <div className="flex-1">
+                            <input
+                              type="url"
+                              value={review.profileImage}
+                              onChange={(e) => {
+                                const newReviews = [...(settings.reviews || [])];
+                                newReviews[index] = { ...newReviews[index], profileImage: e.target.value };
+                                setSettings({ ...settings, reviews: newReviews });
+                              }}
+                              placeholder="https://example.com/photo.jpg"
+                              className="w-full px-4 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark mb-2"
+                            />
+                            <label className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-black/20 rounded cursor-pointer hover:border-brand-dark hover:bg-gray-50 transition-colors">
+                              <Upload size={16} />
+                              <span className="text-sm">Upload Image</span>
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    const formData = new FormData();
+                                    formData.append('image', file);
+                                    
+                                    try {
+                                      const uploadResponse = await fetch('/api/upload-image', {
+                                        method: 'POST',
+                                        body: formData
+                                      });
+                                      
+                                      if (uploadResponse.ok) {
+                                        const { url } = await uploadResponse.json();
+                                        const newReviews = [...(settings.reviews || [])];
+                                        newReviews[index] = { ...newReviews[index], profileImage: url };
+                                        setSettings({ ...settings, reviews: newReviews });
+                                      } else {
+                                        alert('Failed to upload image');
+                                      }
+                                    } catch (error) {
+                                      alert('Failed to upload image');
+                                    }
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Rating</label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => {
+                                const newReviews = [...(settings.reviews || [])];
+                                newReviews[index] = { ...newReviews[index], rating: star };
+                                setSettings({ ...settings, reviews: newReviews });
+                              }}
+                              className="text-2xl hover:scale-110 transition-transform"
+                            >
+                              <span className={review.rating >= star ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Date</label>
+                        <input
+                          type="text"
+                          value={review.date}
+                          onChange={(e) => {
+                            const newReviews = [...(settings.reviews || [])];
+                            newReviews[index] = { ...newReviews[index], date: e.target.value };
+                            setSettings({ ...settings, reviews: newReviews });
+                          }}
+                          placeholder="January 2024"
+                          className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">Review Text</label>
+                        <textarea
+                          value={review.text}
+                          onChange={(e) => {
+                            const newReviews = [...(settings.reviews || [])];
+                            newReviews[index] = { ...newReviews[index], text: e.target.value };
+                            setSettings({ ...settings, reviews: newReviews });
+                          }}
+                          rows={4}
+                          placeholder="DJ Ozzy was amazing! The music was perfect and everyone had a great time..."
+                          className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {(!settings.reviews || settings.reviews.length === 0) && (
+                  <div className="text-center py-12 text-gray-500">
+                    <p>No reviews yet. Click "Add Review" to create your first review.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => {
+                  if (confirm('Discard all changes?')) {
+                    fetchSettings();
+                  }
+                }}
+                className="px-6 py-3 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={saveSettings}
+                disabled={loading}
+                className="px-8 py-3 bg-brand-dark text-white rounded hover:bg-black transition-colors disabled:opacity-50 font-medium tracking-wide"
+              >
+                {loading ? 'Saving...' : 'Save Reviews'}
               </button>
             </div>
           </div>

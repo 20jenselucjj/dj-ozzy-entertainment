@@ -1,20 +1,37 @@
 import React from 'react';
-import { Music, Speaker, Mic2 } from 'lucide-react';
+import { Flame, Music, DollarSign } from 'lucide-react';
 import FadeIn from './FadeIn';
 
 const ServicesSection: React.FC = () => {
   const [content, setContent] = React.useState({
     servicesTitle: 'What I Bring',
     servicesSubtitle: 'Everything you need for an epic night without the hassle or crazy prices.',
-    service1Title: 'Your Music, Your Way',
-    service1Subtitle: 'Custom Playlists',
-    service1Description: "Tell me what you want to hear and I'll make it happen. Whether you're into the latest hits, throwbacks, or a mix of everything, I'll put together a playlist that keeps everyone vibing all night long.",
-    service2Title: 'Quality Sound & Lights',
-    service2Subtitle: 'Professional Setup',
-    service2Description: "I bring legit equipment that sounds amazing and looks even better. Clear audio, awesome lighting effects—everything you need to turn your venue into the place to be.",
-    service3Title: 'Reading the Room',
-    service3Subtitle: 'Keeping It Live',
-    service3Description: "I know when to turn it up and when to bring it down. I'll watch the crowd and adjust on the fly to make sure everyone's having a good time, not just standing around."
+    service1Title: 'Energy you can feel',
+    service1Subtitle: 'CUSTOM PLAYLISTS',
+    service1Description: [
+      "High energy MC that gets crowd hyped",
+      "A DJ who actually KNOWS what the students want",
+      "Real connection with guests",
+      "A DJ who has planed over 10 dances and understands dances from YOUR side"
+    ],
+    service2Title: 'Music Made for the Moment',
+    service2Subtitle: 'PROFESSIONAL SETUP',
+    service2Description: [
+      "Clean, school appropriate music only",
+      "Live mashups & Transitions (no dead air)",
+      "Tailored playlists for each event",
+      "Fresh, updated music - No outdated dance tracks",
+      "Highly crowd interactive playing"
+    ],
+    service3Title: 'Honest, Simple, Affordable',
+    service3Subtitle: 'KEEPING IT LIVE',
+    service3Description: [
+      "Pricing designed specifically for the event",
+      "Flexible packages for budgets big and small",
+      "On time dependable DJ",
+      "Transparent upfront rate - No surprise fees",
+      "Professional contract + payment"
+    ]
   });
 
   React.useEffect(() => {
@@ -27,13 +44,19 @@ const ServicesSection: React.FC = () => {
             servicesSubtitle: data.settings.servicesSubtitle,
             service1Title: data.settings.service1Title,
             service1Subtitle: data.settings.service1Subtitle,
-            service1Description: data.settings.service1Description,
+            service1Description: Array.isArray(data.settings.service1Description) 
+              ? data.settings.service1Description 
+              : data.settings.service1Description.split(/\.\s+/).filter((s: string) => s.trim()),
             service2Title: data.settings.service2Title,
             service2Subtitle: data.settings.service2Subtitle,
-            service2Description: data.settings.service2Description,
+            service2Description: Array.isArray(data.settings.service2Description)
+              ? data.settings.service2Description
+              : data.settings.service2Description.split(/\.\s+/).filter((s: string) => s.trim()),
             service3Title: data.settings.service3Title,
             service3Subtitle: data.settings.service3Subtitle,
-            service3Description: data.settings.service3Description
+            service3Description: Array.isArray(data.settings.service3Description)
+              ? data.settings.service3Description
+              : data.settings.service3Description.split(/\.\s+/).filter((s: string) => s.trim())
           });
         }
       })
@@ -45,19 +68,19 @@ const ServicesSection: React.FC = () => {
       title: content.service1Title,
       subtitle: content.service1Subtitle,
       description: content.service1Description,
-      icon: <Music size={28} />
+      icon: <Flame size={28} />
     },
     {
       title: content.service2Title,
       subtitle: content.service2Subtitle,
       description: content.service2Description,
-      icon: <Speaker size={28} />
+      icon: <Music size={28} />
     },
     {
       title: content.service3Title,
       subtitle: content.service3Subtitle,
       description: content.service3Description,
-      icon: <Mic2 size={28} />
+      icon: <DollarSign size={28} />
     }
   ];
 
@@ -103,9 +126,11 @@ const ServicesSection: React.FC = () => {
                        <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-6">{service.subtitle}</p>
                     </FadeIn>
                     <FadeIn delay={500 + (index * 100)} variant="text">
-                       <p className="text-sm md:text-base leading-relaxed text-gray-700">
-                          {service.description}
-                       </p>
+                       <ul className="text-sm md:text-base leading-relaxed text-gray-700 space-y-1 list-disc list-inside marker:text-gray-700">
+                          {(Array.isArray(service.description) ? service.description : [service.description]).map((line, i) => (
+                            <li key={i}>{line}</li>
+                          ))}
+                       </ul>
                     </FadeIn>
                 </div>
              </div>
