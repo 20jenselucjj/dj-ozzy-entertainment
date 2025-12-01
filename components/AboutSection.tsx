@@ -5,7 +5,7 @@ import FadeIn from './FadeIn';
 const AboutSection: React.FC = () => {
   const [content, setContent] = React.useState({
     meImage: '/me.png',
-    meImageType: 'image' as 'image' | 'video',
+    meImageType: 'image' as 'image' | 'video' | 'youtube',
     meVideoUrl: '',
     meVideoAutoplay: true,
     meVideoMuted: true,
@@ -80,7 +80,16 @@ const AboutSection: React.FC = () => {
 
         {/* Right Image/Video Column */}
         <div className="md:w-2/3 relative h-[50vh] md:h-auto overflow-hidden order-1 md:order-2 bg-gray-200">
-          {(content.meImageType === 'video' || content.meImage.startsWith('data:video')) ? (
+          {content.meImageType === 'youtube' && content.meVideoUrl ? (
+            <div className="relative w-full h-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${extractYouTubeId(content.meVideoUrl)}?autoplay=${content.meVideoAutoplay ? 1 : 0}&mute=${content.meVideoMuted ? 1 : 0}&loop=${content.meVideoLoop ? 1 : 0}&controls=${content.meVideoControls ? 1 : 0}&playlist=${extractYouTubeId(content.meVideoUrl)}`}
+                className="absolute top-0 left-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : (content.meImageType === 'video' || content.meImage.startsWith('data:video')) ? (
             <video
               src={content.meImage}
               className="w-full h-full object-cover"

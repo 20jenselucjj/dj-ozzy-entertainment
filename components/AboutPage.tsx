@@ -8,8 +8,8 @@ const AboutPage: React.FC = () => {
   const [content, setContent] = React.useState({
     aboutImage: '/About.png',
     partyImage: '/Party.png',
-    aboutImageType: 'image' as 'image' | 'video',
-    partyImageType: 'image' as 'image' | 'video',
+    aboutImageType: 'image' as 'image' | 'video' | 'youtube',
+    partyImageType: 'image' as 'image' | 'video' | 'youtube',
     aboutVideoUrl: '',
     partyVideoUrl: '',
     aboutVideoAutoplay: true,
@@ -78,7 +78,16 @@ const AboutPage: React.FC = () => {
       <div className="lg:hidden">
         {/* Hero Image/Video */}
         <div className="relative overflow-hidden pt-4">
-          {(content.aboutImageType === 'video' || content.aboutImage.startsWith('data:video')) ? (
+          {content.aboutImageType === 'youtube' && content.aboutVideoUrl ? (
+            <div className="aspect-[3/4] w-full relative">
+              <iframe
+                src={`https://www.youtube.com/embed/${extractYouTubeId(content.aboutVideoUrl)}?autoplay=${content.aboutVideoAutoplay ? 1 : 0}&mute=${content.aboutVideoMuted ? 1 : 0}&loop=${content.aboutVideoLoop ? 1 : 0}&controls=${content.aboutVideoControls ? 1 : 0}&playlist=${extractYouTubeId(content.aboutVideoUrl)}`}
+                className="absolute top-0 left-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : (content.aboutImageType === 'video' || content.aboutImage.startsWith('data:video')) ? (
             <div className="aspect-[3/4] w-full">
               <video
                 src={content.aboutImage}
@@ -129,7 +138,16 @@ const AboutPage: React.FC = () => {
 
         {/* Party Image/Video */}
         <div className="relative h-[40vh] overflow-hidden">
-          {(content.partyImageType === 'video' || content.partyImage.startsWith('data:video')) ? (
+          {content.partyImageType === 'youtube' && content.partyVideoUrl ? (
+            <div className="relative w-full h-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${extractYouTubeId(content.partyVideoUrl)}?autoplay=${content.partyVideoAutoplay ? 1 : 0}&mute=${content.partyVideoMuted ? 1 : 0}&loop=${content.partyVideoLoop ? 1 : 0}&controls=${content.partyVideoControls ? 1 : 0}&playlist=${extractYouTubeId(content.partyVideoUrl)}`}
+                className="absolute top-0 left-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : (content.partyImageType === 'video' || content.partyImage.startsWith('data:video')) ? (
             <video
               src={content.partyImage}
               className="w-full h-full object-cover"
@@ -180,7 +198,16 @@ const AboutPage: React.FC = () => {
         {/* Right Image/Video Column - Split into two sections */}
         <div className="relative flex flex-col">
           <div className="relative overflow-hidden">
-            {content.aboutImageType === 'video' && content.aboutVideoUrl ? (
+            {content.aboutImageType === 'youtube' && content.aboutVideoUrl ? (
+              <div className="aspect-[3/4] w-full relative">
+                <iframe
+                  src={`https://www.youtube.com/embed/${extractYouTubeId(content.aboutVideoUrl)}?autoplay=${content.aboutVideoAutoplay ? 1 : 0}&mute=${content.aboutVideoMuted ? 1 : 0}&loop=${content.aboutVideoLoop ? 1 : 0}&controls=${content.aboutVideoControls ? 1 : 0}&playlist=${extractYouTubeId(content.aboutVideoUrl)}`}
+                  className="absolute top-0 left-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : content.aboutImageType === 'video' && content.aboutImage.startsWith('data:video') ? (
               <div className="aspect-[3/4] w-full">
                 <video
                   src={content.aboutImage}
@@ -188,17 +215,6 @@ const AboutPage: React.FC = () => {
                   autoPlay={content.aboutVideoAutoplay}
                   muted={content.aboutVideoMuted}
                   loop={content.aboutVideoLoop}
-                  playsInline
-                />
-              </div>
-            ) : content.aboutImage.startsWith('data:video') ? (
-              <div className="aspect-[3/4] w-full">
-                <video
-                  src={content.aboutImage}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
                   playsInline
                 />
               </div>
@@ -215,21 +231,24 @@ const AboutPage: React.FC = () => {
           <div className="h-3 bg-brand-beige"></div>
           
           <div className="relative h-1/2 overflow-hidden">
-            {content.partyImageType === 'video' && content.partyVideoUrl ? (
+            {content.partyImageType === 'youtube' && content.partyVideoUrl ? (
               <div className="relative w-full h-full">
                 <iframe
-                  src={`https://www.youtube.com/embed/${extractYouTubeId(content.partyVideoUrl)}?autoplay=${content.partyVideoAutoplay ? '1' : '0'}&mute=${content.partyVideoMuted ? '1' : '0'}&controls=${content.partyVideoControls ? '1' : '0'}&loop=${content.partyVideoLoop ? '1' : '0'}&playlist=${extractYouTubeId(content.partyVideoUrl)}&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1`}
-                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${extractYouTubeId(content.partyVideoUrl)}?autoplay=${content.partyVideoAutoplay ? 1 : 0}&mute=${content.partyVideoMuted ? 1 : 0}&loop=${content.partyVideoLoop ? 1 : 0}&controls=${content.partyVideoControls ? 1 : 0}&playlist=${extractYouTubeId(content.partyVideoUrl)}`}
+                  className="absolute top-0 left-0 w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
-                {!content.partyVideoControls && (
-                  <>
-                    <div className="absolute top-0 left-0 right-0 h-16 bg-transparent pointer-events-auto z-10" style={{ pointerEvents: 'none' }}></div>
-                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-transparent pointer-events-auto z-10" style={{ pointerEvents: 'none' }}></div>
-                  </>
-                )}
               </div>
+            ) : content.partyImageType === 'video' && content.partyImage.startsWith('data:video') ? (
+              <video
+                src={content.partyImage}
+                className="w-full h-full object-cover"
+                autoPlay={content.partyVideoAutoplay}
+                muted={content.partyVideoMuted}
+                loop={content.partyVideoLoop}
+                playsInline
+              />
             ) : (
               <img 
                 src={content.partyImage} 

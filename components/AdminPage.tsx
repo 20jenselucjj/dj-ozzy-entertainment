@@ -8,8 +8,12 @@ interface Event {
   location: string;
   image: string;
   rating?: number;
-  mediaType?: 'image' | 'video';
+  mediaType?: 'image' | 'video' | 'youtube';
   videoUrl?: string;
+  videoAutoplay?: boolean;
+  videoMuted?: boolean;
+  videoLoop?: boolean;
+  videoControls?: boolean;
 }
 
 interface FormEvent extends Event {
@@ -32,9 +36,9 @@ interface SiteSettings {
   meImage: string;
   
   // Image Media Types
-  aboutImageType?: 'image' | 'video';
-  partyImageType?: 'image' | 'video';
-  meImageType?: 'image' | 'video';
+  aboutImageType?: 'image' | 'video' | 'youtube';
+  partyImageType?: 'image' | 'video' | 'youtube';
+  meImageType?: 'image' | 'video' | 'youtube';
   
   // Video URLs
   aboutVideoUrl?: string;
@@ -339,7 +343,13 @@ const AdminPage: React.FC = () => {
         image: imageUrl,
         ...(editingEvent.rating && editingEvent.rating > 0 ? { rating: editingEvent.rating } : {}),
         mediaType: editingEvent.mediaType || 'image',
-        videoUrl: editingEvent.videoUrl || ''
+        videoUrl: editingEvent.videoUrl || '',
+        ...(editingEvent.mediaType === 'youtube' ? {
+          videoAutoplay: editingEvent.videoAutoplay,
+          videoMuted: editingEvent.videoMuted,
+          videoLoop: editingEvent.videoLoop,
+          videoControls: editingEvent.videoControls
+        } : {})
       };
       
       const token = sessionStorage.getItem('adminToken');
@@ -564,7 +574,7 @@ const AdminPage: React.FC = () => {
                         type="radio"
                         name="mediaType"
                         value="image"
-                        checked={editingEvent.mediaType !== 'video'}
+                        checked={editingEvent.mediaType !== 'video' && editingEvent.mediaType !== 'youtube'}
                         onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'image', videoUrl: '' })}
                         className="w-4 h-4"
                       />
@@ -576,14 +586,92 @@ const AdminPage: React.FC = () => {
                         name="mediaType"
                         value="video"
                         checked={editingEvent.mediaType === 'video'}
-                        onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'video' })}
+                        onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'video', videoUrl: '' })}
                         className="w-4 h-4"
                       />
                       <span>Video</span>
                     </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="mediaType"
+                        value="youtube"
+                        checked={editingEvent.mediaType === 'youtube'}
+                        onChange={() => setEditingEvent({ ...editingEvent, mediaType: 'youtube', image: '' })}
+                        className="w-4 h-4"
+                      />
+                      <span>YouTube</span>
+                    </label>
                   </div>
 
-                  {editingEvent.mediaType === 'video' ? (
+                  {editingEvent.mediaType === 'youtube' ? (
+                    <div>
+                      {/* Video Settings */}
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingEvent.videoAutoplay !== false}
+                            onChange={(e) => setEditingEvent({ ...editingEvent, videoAutoplay: e.target.checked })}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-xs">Autoplay</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingEvent.videoMuted !== false}
+                            onChange={(e) => setEditingEvent({ ...editingEvent, videoMuted: e.target.checked })}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-xs">Muted</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingEvent.videoLoop !== false}
+                            onChange={(e) => setEditingEvent({ ...editingEvent, videoLoop: e.target.checked })}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-xs">Loop</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editingEvent.videoControls !== false}
+                            onChange={(e) => setEditingEvent({ ...editingEvent, videoControls: e.target.checked })}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-xs">Controls</span>
+                        </label>
+                      </div>
+
+                      {/* YouTube Preview */}
+                      {editingEvent.videoUrl && extractYouTubeId(editingEvent.videoUrl) && (
+                        <div className="mb-4 relative aspect-[3/4] w-48 mx-auto overflow-hidden rounded-lg border border-black/10 shadow-md">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${extractYouTubeId(editingEvent.videoUrl)}?autoplay=${editingEvent.videoAutoplay !== false ? 1 : 0}&mute=${editingEvent.videoMuted !== false ? 1 : 0}&loop=${editingEvent.videoLoop !== false ? 1 : 0}&controls=${editingEvent.videoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(editingEvent.videoUrl)}`}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        </div>
+                      )}
+                      
+                      {/* YouTube URL Input */}
+                      <div>
+                        <label className="block text-sm font-medium mb-2 uppercase tracking-wide text-gray-600">YouTube URL</label>
+                        <input
+                          type="url"
+                          value={editingEvent.videoUrl || ''}
+                          onChange={(e) => setEditingEvent({ ...editingEvent, videoUrl: e.target.value })}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="w-full px-4 py-3 border border-black/20 rounded focus:outline-none focus:border-brand-dark transition-colors"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Paste any YouTube video URL</p>
+                      </div>
+                    </div>
+                  ) : editingEvent.mediaType === 'video' ? (
                     <div>
                       {/* Video Preview */}
                       {(imagePreview || editingEvent.image) && (imagePreview.startsWith('data:video') || editingEvent.image.startsWith('data:video')) && (
@@ -645,7 +733,7 @@ const AdminPage: React.FC = () => {
                 
                 <button
                   onClick={handleSave}
-                  disabled={loading || !editingEvent.title || !editingEvent.date || !editingEvent.location || (!editingEvent.image && !editingEvent.imageFile)}
+                  disabled={loading || !editingEvent.title || !editingEvent.date || !editingEvent.location || (editingEvent.mediaType === 'youtube' ? !editingEvent.videoUrl : (!editingEvent.image && !editingEvent.imageFile))}
                   className="w-full bg-brand-dark text-white py-4 rounded hover:bg-black transition-colors flex items-center justify-center gap-2 font-medium tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save size={20} /> {loading ? 'Saving...' : 'Save Event'}
@@ -659,12 +747,21 @@ const AdminPage: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="bg-white rounded-lg shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden border border-black/10 group hover:shadow-[0_20px_60px_rgba(0,0,0,0.2)] transition-shadow">
               <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                {event.mediaType === 'video' && event.videoUrl ? (
+                {event.mediaType === 'youtube' && event.videoUrl ? (
                   <iframe
-                    src={`https://www.youtube.com/embed/${extractYouTubeId(event.videoUrl)}`}
+                    src={`https://www.youtube.com/embed/${extractYouTubeId(event.videoUrl)}?autoplay=${event.videoAutoplay !== false ? 1 : 0}&mute=${event.videoMuted !== false ? 1 : 0}&loop=${event.videoLoop !== false ? 1 : 0}&controls=${event.videoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(event.videoUrl)}`}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                  />
+                ) : event.mediaType === 'video' && event.image ? (
+                  <video 
+                    src={event.image} 
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
                   />
                 ) : (
                   <img 
@@ -1128,13 +1225,13 @@ const AdminPage: React.FC = () => {
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">About Page Hero</h3>
                 
                 {/* Media Type Selection */}
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-2 mb-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="aboutImageType"
                       value="image"
-                      checked={settings.aboutImageType !== 'video'}
+                      checked={settings.aboutImageType !== 'video' && settings.aboutImageType !== 'youtube'}
                       onChange={() => setSettings({ ...settings, aboutImageType: 'image', aboutVideoUrl: '' })}
                       className="w-4 h-4"
                     />
@@ -1146,14 +1243,87 @@ const AdminPage: React.FC = () => {
                       name="aboutImageType"
                       value="video"
                       checked={settings.aboutImageType === 'video'}
-                      onChange={() => setSettings({ ...settings, aboutImageType: 'video' })}
+                      onChange={() => setSettings({ ...settings, aboutImageType: 'video', aboutVideoUrl: '' })}
                       className="w-4 h-4"
                     />
                     <span className="text-sm">Video</span>
                   </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="aboutImageType"
+                      value="youtube"
+                      checked={settings.aboutImageType === 'youtube'}
+                      onChange={() => setSettings({ ...settings, aboutImageType: 'youtube' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">YouTube</span>
+                  </label>
                 </div>
 
-                {settings.aboutImageType === 'video' ? (
+                {settings.aboutImageType === 'youtube' ? (
+                  <div>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.aboutVideoControls !== false}
+                          onChange={(e) => setSettings({ ...settings, aboutVideoControls: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Controls</span>
+                      </label>
+                    </div>
+                    {settings.aboutVideoUrl && extractYouTubeId(settings.aboutVideoUrl) && (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${extractYouTubeId(settings.aboutVideoUrl)}?autoplay=${settings.aboutVideoAutoplay !== false ? 1 : 0}&mute=${settings.aboutVideoMuted !== false ? 1 : 0}&loop=${settings.aboutVideoLoop !== false ? 1 : 0}&controls=${settings.aboutVideoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(settings.aboutVideoUrl)}`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium mb-2 uppercase tracking-wide text-gray-600">YouTube URL</label>
+                      <input
+                        type="url"
+                        value={settings.aboutVideoUrl || ''}
+                        onChange={(e) => setSettings({ ...settings, aboutVideoUrl: e.target.value })}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="w-full px-3 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark text-sm"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Paste any YouTube video URL</p>
+                    </div>
+                  </div>
+                ) : settings.aboutImageType === 'video' ? (
                   <div>
                     <div className="grid grid-cols-3 gap-3 mb-4">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -1241,13 +1411,13 @@ const AdminPage: React.FC = () => {
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Party Atmosphere</h3>
                 
                 {/* Media Type Selection */}
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-2 mb-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="partyImageType"
                       value="image"
-                      checked={settings.partyImageType !== 'video'}
+                      checked={settings.partyImageType !== 'video' && settings.partyImageType !== 'youtube'}
                       onChange={() => setSettings({ ...settings, partyImageType: 'image', partyVideoUrl: '' })}
                       className="w-4 h-4"
                     />
@@ -1259,14 +1429,87 @@ const AdminPage: React.FC = () => {
                       name="partyImageType"
                       value="video"
                       checked={settings.partyImageType === 'video'}
-                      onChange={() => setSettings({ ...settings, partyImageType: 'video' })}
+                      onChange={() => setSettings({ ...settings, partyImageType: 'video', partyVideoUrl: '' })}
                       className="w-4 h-4"
                     />
                     <span className="text-sm">Video</span>
                   </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="partyImageType"
+                      value="youtube"
+                      checked={settings.partyImageType === 'youtube'}
+                      onChange={() => setSettings({ ...settings, partyImageType: 'youtube' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">YouTube</span>
+                  </label>
                 </div>
 
-                {settings.partyImageType === 'video' ? (
+                {settings.partyImageType === 'youtube' ? (
+                  <div>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.partyVideoControls !== false}
+                          onChange={(e) => setSettings({ ...settings, partyVideoControls: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Controls</span>
+                      </label>
+                    </div>
+                    {settings.partyVideoUrl && extractYouTubeId(settings.partyVideoUrl) && (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${extractYouTubeId(settings.partyVideoUrl)}?autoplay=${settings.partyVideoAutoplay !== false ? 1 : 0}&mute=${settings.partyVideoMuted !== false ? 1 : 0}&loop=${settings.partyVideoLoop !== false ? 1 : 0}&controls=${settings.partyVideoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(settings.partyVideoUrl)}`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium mb-2 uppercase tracking-wide text-gray-600">YouTube URL</label>
+                      <input
+                        type="url"
+                        value={settings.partyVideoUrl || ''}
+                        onChange={(e) => setSettings({ ...settings, partyVideoUrl: e.target.value })}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="w-full px-3 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark text-sm"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Paste any YouTube video URL</p>
+                    </div>
+                  </div>
+                ) : settings.partyImageType === 'video' ? (
                   <div>
                     <div className="grid grid-cols-3 gap-3 mb-4">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -1354,13 +1597,13 @@ const AdminPage: React.FC = () => {
                 <h3 className="font-medium mb-4 uppercase tracking-wide text-sm">Homepage About Section</h3>
                 
                 {/* Media Type Selection */}
-                <div className="flex gap-4 mb-4">
+                <div className="flex gap-2 mb-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="meImageType"
                       value="image"
-                      checked={settings.meImageType !== 'video'}
+                      checked={settings.meImageType !== 'video' && settings.meImageType !== 'youtube'}
                       onChange={() => setSettings({ ...settings, meImageType: 'image', meVideoUrl: '' })}
                       className="w-4 h-4"
                     />
@@ -1372,14 +1615,87 @@ const AdminPage: React.FC = () => {
                       name="meImageType"
                       value="video"
                       checked={settings.meImageType === 'video'}
-                      onChange={() => setSettings({ ...settings, meImageType: 'video' })}
+                      onChange={() => setSettings({ ...settings, meImageType: 'video', meVideoUrl: '' })}
                       className="w-4 h-4"
                     />
                     <span className="text-sm">Video</span>
                   </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="meImageType"
+                      value="youtube"
+                      checked={settings.meImageType === 'youtube'}
+                      onChange={() => setSettings({ ...settings, meImageType: 'youtube' })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">YouTube</span>
+                  </label>
                 </div>
 
-                {settings.meImageType === 'video' ? (
+                {settings.meImageType === 'youtube' ? (
+                  <div>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoAutoplay !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoAutoplay: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Autoplay</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoMuted !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoMuted: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Muted</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoLoop !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoLoop: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Loop</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.meVideoControls !== false}
+                          onChange={(e) => setSettings({ ...settings, meVideoControls: e.target.checked })}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-xs">Controls</span>
+                      </label>
+                    </div>
+                    {settings.meVideoUrl && extractYouTubeId(settings.meVideoUrl) && (
+                      <div className="aspect-[3/4] mb-4 overflow-hidden rounded border border-black/10">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${extractYouTubeId(settings.meVideoUrl)}?autoplay=${settings.meVideoAutoplay !== false ? 1 : 0}&mute=${settings.meVideoMuted !== false ? 1 : 0}&loop=${settings.meVideoLoop !== false ? 1 : 0}&controls=${settings.meVideoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(settings.meVideoUrl)}`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium mb-2 uppercase tracking-wide text-gray-600">YouTube URL</label>
+                      <input
+                        type="url"
+                        value={settings.meVideoUrl || ''}
+                        onChange={(e) => setSettings({ ...settings, meVideoUrl: e.target.value })}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="w-full px-3 py-2 border border-black/20 rounded focus:outline-none focus:border-brand-dark text-sm"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Paste any YouTube video URL</p>
+                    </div>
+                  </div>
+                ) : settings.meImageType === 'video' ? (
                   <div>
                     <div className="grid grid-cols-3 gap-3 mb-4">
                       <label className="flex items-center gap-2 cursor-pointer">

@@ -9,8 +9,12 @@ interface Event {
   location: string;
   image: string;
   rating?: number;
-  mediaType?: 'image' | 'video';
+  mediaType?: 'image' | 'video' | 'youtube';
   videoUrl?: string;
+  videoAutoplay?: boolean;
+  videoMuted?: boolean;
+  videoLoop?: boolean;
+  videoControls?: boolean;
 }
 
 const defaultEvents: Event[] = [];
@@ -126,12 +130,21 @@ const PastEventsSection: React.FC = () => {
           {events.map((event) => (
             <div key={event.id} className="group relative cursor-pointer overflow-hidden flex-shrink-0 w-[280px] first:ml-4 md:first:ml-0">
                {/* Card Content */}
-               <div className="aspect-[3/4] overflow-hidden bg-gray-200">
-                  {(event.mediaType === 'video' || event.image.startsWith('data:video')) ? (
+               <div className="aspect-[3/4] overflow-hidden bg-gray-200 relative">
+                  {event.mediaType === 'youtube' && event.videoUrl ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${extractYouTubeId(event.videoUrl)}?autoplay=${event.videoAutoplay !== false ? 1 : 0}&mute=${event.videoMuted !== false ? 1 : 0}&loop=${event.videoLoop !== false ? 1 : 0}&controls=${event.videoControls !== false ? 1 : 0}&playlist=${extractYouTubeId(event.videoUrl)}`}
+                      className="absolute top-0 left-0 w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (event.mediaType === 'video' || event.image.startsWith('data:video')) ? (
                     <video
                       src={event.image}
                       className="w-full h-full object-cover"
-                      controls
+                      autoPlay
+                      muted
+                      loop
                       playsInline
                     />
                   ) : (
